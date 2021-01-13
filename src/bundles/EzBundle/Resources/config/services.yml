@@ -1,0 +1,30 @@
+parameters:
+
+services:
+  # default configuration for services in *this* file
+  _defaults:
+    # automatically injects dependencies in your services
+    autowire: true
+    # automatically registers your services as commands, event subscribers, etc.
+    autoconfigure: true
+    # this means you cannot fetch services directly from the container via $container->get()
+    # if you need to do this, you can override this setting on individual services
+    public: false
+
+  AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\FormMapper:
+    tags:
+      - { name: ez.fieldFormMapper.definition, fieldType: calameo_publication }
+      - { name: ez.fieldFormMapper.value, fieldType: calameo_publication }
+
+  AlmaviaCX\Calameo\Ez\Form\Type\FieldType\CalameoPublicationFieldType:
+
+  AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Gateway\DoctrineStorage:
+
+  almaviacx.calameo.httpclient.siteaccessaware:
+    lazy: true
+    class: AlmaviaCX\Calameo\API\HttpClient
+    decorates: AlmaviaCX\Calameo\API\HttpClient
+    arguments:
+      $APIKey: "$calameo.api.key;almaviacx$"
+      $APISecret: "$calameo.api.secret;almaviacx$"
+      $config: "$calameo.config;almaviacx$"

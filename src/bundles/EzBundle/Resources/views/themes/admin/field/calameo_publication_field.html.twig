@@ -1,0 +1,13 @@
+{# @var publication \AlmaviaCX\Calameo\API\Value\Publication #}
+{% extends '@EzPublishCore/content_fields.html.twig' %}
+
+{% block calameo_publication_field %}
+    {% set publication = field.value.publication %}
+    {% if publication %}
+        {% if publication.viewUrl %}
+            <a href="{{ publication.viewUrl }}" target="_blank">{{ publication.name }} ({{ publication.id }})</a>
+        {% else %}
+            {{ publication.name }} ({{ publication.id }})
+        {% endif %}
+    {% endif %}
+{% endblock %}

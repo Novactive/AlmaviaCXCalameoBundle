@@ -1,0 +1,30 @@
+parameters:
+
+services:
+  # default configuration for services in *this* file
+  _defaults:
+    # automatically injects dependencies in your services
+    autowire: true
+    # automatically registers your services as commands, event subscribers, etc.
+    autoconfigure: true
+    # this means you cannot fetch services directly from the container via $container->get()
+    # if you need to do this, you can override this setting on individual services
+    public: true
+
+  AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Type:
+    tags:
+      - { name: ezpublish.fieldType, alias: calameo_publication }
+      - { name: ezpublish.fieldType.nameable, alias: calameo_publication }
+
+  AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\LegacyConverter:
+    tags:
+      - { name: ezpublish.storageEngine.legacy.converter, alias: calameo_publication }
+
+  AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\FieldStorage:
+    tags:
+      - { name: ezpublish.fieldType.externalStorageHandler, alias: calameo_publication }
+
+  almaviacx.calameo.fieldtype.indexable.calameo_publication:
+    class: "%ezpublish.fieldType.indexable.unindexed.class%"
+    tags:
+      - { name: ezpublish.fieldType.indexable, alias: calameo_publication }

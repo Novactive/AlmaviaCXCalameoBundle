@@ -1,0 +1,47 @@
+{# @var publication \AlmaviaCX\Calameo\API\Value\Publication #}
+{% trans_default_domain 'ezrepoforms_content' %}
+
+{% use '@ezdesign/fieldtypes/edit/binary_base.html.twig' %}
+
+{%- block ezplatform_fieldtype_calameo_publication_row -%}
+    {% set widget_container_block_name = 'calameo_publication_widget_container' %}
+    {% set preview_block_name = 'calameo_publication_preview' %}
+    {% set max_file_size = 0 %}
+    {% set file_is_empty = form.parent.vars.value.value.publicationId is null %}
+    {{ block('binary_base_row') }}
+{%- endblock -%}
+
+{% block calameo_publication_preview %}
+    {% set publication = form.parent.vars.value.value.publication %}
+    <div class="ez-field-edit-preview">
+        <div class="ez-field-edit-preview__visual">
+            <div class="ez-field-edit-preview__file-name">{{ publication ? publication.name }}</div>
+        </div>
+        <div class="ez-field-edit-preview__actions">
+            <a class="ez-field-edit-preview__action--preview" href="{{ publication ? publication.viewUrl }}" target="_blank"
+               title="{{ 'ezbinaryfile.action.preview'|trans|desc('Preview') }}" download>
+                <svg class="ez-icon">
+                    <use xlink:href="/bundles/ezplatformadminui/img/ez-icons.svg#view"></use>
+                </svg>
+            </a>
+            <button type="button" class="ez-field-edit-preview__action--remove" title="{{ 'ezbinaryfile.action.remove'|trans|desc('Remove') }}">
+                <svg class="ez-icon">
+                    <use xlink:href="/bundles/ezplatformadminui/img/ez-icons.svg#trash"></use>
+                </svg>
+            </button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block calameo_publication_widget_container %}
+    {{- form_widget(form.publicationId) -}}
+    {{- form_widget(form.folderId) -}}
+    <div{% with { attr: preview_attr } %}{{ block('attributes') }}{% endwith %}>
+        {{ block(preview_block_name) }}
+    </div>
+    <div{% with { attr: widget_wrapper_attr } %}{{ block('attributes') }}{% endwith %}>
+        <div class="ez-data-source">
+            {{ block('binary_base_widget') }}
+        </div>
+    </div>
+{% endblock %}

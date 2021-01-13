@@ -1,0 +1,35 @@
+.ez-field-edit--calameo_publication {
+    &.ez-field-edit--with-preview {
+        .ez-field-edit-preview {
+            width: 500px;
+            height: 80px;
+            line-height: 80px;
+
+            &__visual {
+                display: flex;
+            }
+
+            &__actions {
+                flex: 0 0 100px;
+                display: flex;
+                align-items: center;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+
+            &__action--preview {
+                margin-top: 0;
+            }
+
+            &__file-name {
+                flex: 1 1 auto;
+                font-size: .75rem;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+            }
+        }
+    }
+}
