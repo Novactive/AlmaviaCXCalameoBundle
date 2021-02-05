@@ -16,6 +16,7 @@ use AlmaviaCX\Calameo\API\HttpClient;
 use AlmaviaCX\Calameo\API\Serializer;
 use AlmaviaCX\Calameo\API\Value\Response\Response;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
+use AlmaviaCX\Calameo\Exception\ExceptionThrower;
 use GuzzleHttp\Exception\GuzzleException;
 
 abstract class AbstractGateway
@@ -27,22 +28,32 @@ abstract class AbstractGateway
     /** @var Serializer */
     protected $serializer;
 
+    /** @var ExceptionThrower */
+    protected $exceptionThrower;
+
     /**
      * AbstractGateway constructor.
-     * @param HttpClient $client
-     * @param Serializer $serializer
+     *
+     * @param HttpClient       $client
+     * @param Serializer       $serializer
+     * @param ExceptionThrower $exceptionThrower
      */
-    public function __construct(HttpClient $client, Serializer $serializer)
-    {
+    public function __construct(
+        HttpClient $client,
+        Serializer $serializer,
+        ExceptionThrower $exceptionThrower
+    ) {
         $this->client = $client;
         $this->serializer = $serializer;
+        $this->exceptionThrower = $exceptionThrower;
     }
 
     /**
-     * @param string $action
+     * @param string      $action
      * @param string|null $responseContentType
-     * @param array $requestParameters
-     * @param string $method
+     * @param array       $requestParameters
+     * @param string      $method
+     *
      * @return Response
      * @throws ApiResponseErrorException
      * @throws GuzzleException
@@ -68,9 +79,9 @@ abstract class AbstractGateway
             $responseContentType
         );
         if ($response->status === Response::TYPE_ERROR) {
-            throw new ApiResponseErrorException(
-                $response->error->message,
-                $response->error->code
+            $this->exceptionThrower->throwApiException(
+                $response->error->code,
+                $response->error->message
             );
         }
 

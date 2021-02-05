@@ -14,6 +14,7 @@ namespace AlmaviaCX\Calameo\Ez\Form\Type\FieldType;
 
 use AlmaviaCX\Calameo\API\Repository\AccountRepository;
 use AlmaviaCX\Calameo\API\Repository\FolderRepository;
+use AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Value;
 use EzSystems\RepositoryForms\Form\Type\FieldType\BinaryBaseFieldType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -21,6 +22,8 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CalameoPublicationFieldType extends AbstractType
@@ -30,6 +33,7 @@ class CalameoPublicationFieldType extends AbstractType
 
     /**
      * CalameoPublicationFieldType constructor.
+     *
      * @param AccountRepository $accountRepository
      */
     public function __construct(AccountRepository $accountRepository)
@@ -71,7 +75,7 @@ class CalameoPublicationFieldType extends AbstractType
                 'folderId',
                 ChoiceType::class,
                 [
-                    'choices' => $folderChoices
+                    'choices' => $folderChoices,
                 ]
             )
             ->add(
@@ -85,10 +89,30 @@ class CalameoPublicationFieldType extends AbstractType
                 'file',
                 FileType::class,
                 [
-                    'label' => /** @Desc("File") */ 'content.field_type.binary_base.file',
+                    'label'    => /** @Desc("File") */ 'content.field_type.binary_base.file',
                     'required' => $options['required'],
                 ]
             );
+
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            static function (FormEvent $event) use ($folderChoices) {
+                /** @var Value $data */
+                $data = $event->getData();
+                $form = $event->getForm();
+
+                if ($data->publicationId !== null) {
+                    $form->add(
+                        'folderId',
+                        ChoiceType::class,
+                        [
+                            'choices' => $folderChoices,
+                            'disabled' => true
+                        ]
+                    );
+                }
+            }
+        );
     }
 
     public function getParent()

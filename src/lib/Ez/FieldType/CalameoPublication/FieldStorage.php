@@ -17,6 +17,7 @@ use AlmaviaCX\Calameo\API\Service\PublishingService;
 use AlmaviaCX\Calameo\API\Value\Publication;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
 use AlmaviaCX\Calameo\Exception\NotImplementedException;
+use AlmaviaCX\Calameo\Exception\Response\UnknownBookIDException;
 use AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Gateway\DoctrineStorage;
 use eZ\Publish\SPI\Persistence\Content\Field;
 use eZ\Publish\SPI\Persistence\Content\VersionInfo;
@@ -66,16 +67,20 @@ class FieldStorage implements FieldStorageInterface
         $inputUri = $field->value->externalData['inputUri'] ?? null;
         if ($inputUri) {
             $file = new SplFileInfo($inputUri);
-            if ($field->value->data['publicationId'] !== null) {
+            try {
+                if ($field->value->data['publicationId'] === null) {
+                    throw new UnknownBookIDException();
+                }
                 $publication = $this->publishingService->revise(
                     $field->value->data['publicationId'],
                     $file
                 );
-            } else {
+            } catch (UnknownBookIDException $exception) {
                 $publication = $this->publishingService->publish(
                     $field->value->data['folderId'],
                     $file,
                     [
+                        'name' => $versionInfo->contentInfo->name,
                         'is_published' => 1,
                         'publishing_mode' => Publication::PUBLISHING_MODE_PUBLIC,
                     ]
@@ -100,13 +105,9 @@ class FieldStorage implements FieldStorageInterface
         $field->value->externalData['publicationLoader'] = static function () use ($repository, $field) {
             try {
                 return $repository->getPublicationInfos($field->value->data['publicationId']);
-            } catch (ApiResponseErrorException $exception) {
-                // 501 = Unknown book ID
-                if ($exception->getCode() !== 501) {
-                    throw $exception;
-                }
+            } catch (UnknownBookIDException $exception) {
+                return;
             }
-            return null;
         };
     }
 
@@ -123,11 +124,8 @@ class FieldStorage implements FieldStorageInterface
             foreach ($publicationIds as $publicationId) {
                 try {
                     $this->publicationRepository->deletePublication($publicationId);
-                } catch (ApiResponseErrorException $exception) {
-                    // 501 = Unknown book ID
-                    if ($exception->getCode() !== 501) {
-                        throw $exception;
-                    }
+                } catch (UnknownBookIDException $exception) {
+                    continue;
                 }
             }
         }

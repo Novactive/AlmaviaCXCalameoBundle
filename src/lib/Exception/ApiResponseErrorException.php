@@ -14,7 +14,7 @@ namespace AlmaviaCX\Calameo\Exception;
 
 use Exception;
 
-class ApiResponseErrorException extends Exception
+interface ApiResponseErrorException
 {
 
 }
