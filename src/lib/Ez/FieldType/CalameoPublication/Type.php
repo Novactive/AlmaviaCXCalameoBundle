@@ -116,11 +116,10 @@ class Type extends FieldType
     {
         return new PersistenceValue(
             [
-                'data' => [
-                    'publicationId' => $value->publicationId ?? null,
-                    'folderId' => $value->folderId ?? null
-                ],
+                'data' => [],
                 'externalData' => [
+                    'publicationId' => $value->publicationId ?? null,
+                    'folderId' => $value->folderId ?? null,
                     'inputUri' => $value->inputUri
                 ],
                 'sortKey' => $this->getSortInfo($value),
@@ -134,12 +133,10 @@ class Type extends FieldType
      */
     public function fromPersistenceValue(PersistenceValue $fieldValue): Value
     {
-        if ($fieldValue->data === null) {
+        if ($fieldValue->externalData === null) {
             return $this->getEmptyValue();
         }
 
-        $valueProperties = $fieldValue->data;
-        $valueProperties['publicationLoader'] = $fieldValue->externalData['publicationLoader'] ?? null;
-        return new Value($valueProperties);
+        return new Value($fieldValue->externalData ?? []);
     }
 }

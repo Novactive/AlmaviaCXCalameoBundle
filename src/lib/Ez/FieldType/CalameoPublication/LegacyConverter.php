@@ -23,16 +23,10 @@ class LegacyConverter implements Converter
 
     public function toStorageValue(FieldValue $value, StorageFieldValue $storageFieldValue)
     {
-        $storageFieldValue->dataText = $value->data['publicationId'];
-        $storageFieldValue->dataInt = $value->data['folderId'];
     }
 
     public function toFieldValue(StorageFieldValue $value, FieldValue $fieldValue)
     {
-        $fieldValue->data = [
-            'publicationId' => $value->dataText,
-            'folderId' => $value->dataInt,
-        ];
     }
 
     public function toStorageFieldDefinition(FieldDefinition $fieldDef, StorageFieldDefinition $storageDef)
