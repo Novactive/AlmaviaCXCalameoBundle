@@ -103,11 +103,12 @@ class FieldStorage implements FieldStorageInterface
     {
         $repository = $this->publicationRepository;
 
-        $field->value->externalData = $this->gateway->getPublicationReferenceData($field->id, $versionInfo->versionNo);
-        if ($field->value->externalData === null) {
+         $publicationReferenceData = $this->gateway->getPublicationReferenceData($field->id, $versionInfo->versionNo);
+        if ($publicationReferenceData === null || !$publicationReferenceData['publicationId']) {
             return;
         }
 
+        $field->value->externalData = $publicationReferenceData;
         $field->value->externalData['publicationLoader'] = static function () use ($repository, $field) {
             try {
                 return $repository->getPublicationInfos($field->value->externalData['publicationId']);
@@ -130,7 +131,7 @@ class FieldStorage implements FieldStorageInterface
         }
 
         $publicationIds = $this->gateway->getReferencedPublications($fieldIds, $versionInfo->versionNo);
-
+        $publicationIds = array_filter($publicationIds);
         $this->gateway->removePublicationReferences($fieldIds, $versionInfo->versionNo);
 
         foreach ($publicationIds as $publicationId) {
