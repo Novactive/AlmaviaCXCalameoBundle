@@ -88,10 +88,10 @@ class DoctrineStorage extends StorageGateway
     protected function setUpdateColumns(QueryBuilder $queryBuilder, VersionInfo $versionInfo, Field $field)
     {
         $queryBuilder
-            ->setValue('contentobject_attribute_id', ':fieldId')
-            ->setValue('publication_id', ':publicationId')
-            ->setValue('folder_id', ':folderId')
-            ->setValue('version', ':versionNo')
+            ->set('contentobject_attribute_id', ':fieldId')
+            ->set('publication_id', ':publicationId')
+            ->set('folder_id', ':folderId')
+            ->set('version', ':versionNo')
             ->setParameter(':fieldId', $field->id, PDO::PARAM_INT)
             ->setParameter(':publicationId', $field->value->externalData['publicationId'], PDO::PARAM_STR)
             ->setParameter(':folderId', $field->value->externalData['folderId'], PDO::PARAM_INT)
