@@ -60,10 +60,10 @@ class CalameoPublicationFieldType extends AbstractType
         do {
             $availableFolders = $this->accountRepository->fetchAccountFolders($limit, $offset);
             foreach ($availableFolders->items as $availableFolder) {
-                if(
+                if (
                     empty($options['available_folder_ids']) ||
                     in_array($availableFolder->id, $options['available_folder_ids'])
-                ){
+                ) {
                     $filteredFolderChoices[$availableFolder->name] = $availableFolder->id;
                 }
                 $folderChoices[$availableFolder->name] = $availableFolder->id;
