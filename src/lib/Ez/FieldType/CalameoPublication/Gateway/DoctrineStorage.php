@@ -237,7 +237,7 @@ class DoctrineStorage extends StorageGateway
      *
      * @return array
      */
-    public function getReferencedPublications(array $fieldIds, $versionNo)
+    public function getReferencedPublications(array $fieldIds)
     {
         if (empty($fieldIds)) {
             return [];
@@ -246,28 +246,25 @@ class DoctrineStorage extends StorageGateway
         $selectQuery = $this->connection->createQueryBuilder();
         $selectQuery
             ->select(
-                $this->connection->quoteIdentifier('publication_id')
+                $this->connection->quoteIdentifier('publication_id'),
+                $this->connection->quoteIdentifier('version')
             )
             ->from($this->connection->quoteIdentifier('calameo_publication'))
             ->where(
-                $selectQuery->expr()->andX(
-                    $selectQuery->expr()->in(
-                        $this->connection->quoteIdentifier('contentobject_attribute_id'),
-                        ':fieldIds'
-                    ),
-                    $selectQuery->expr()->eq(
-                        $this->connection->quoteIdentifier('version'),
-                        ':versionNo'
-                    )
+                $selectQuery->expr()->in(
+                    $this->connection->quoteIdentifier('contentobject_attribute_id'),
+                    ':fieldIds'
                 )
             )
-            ->setParameter(':fieldIds', $fieldIds, Connection::PARAM_INT_ARRAY)
-            ->setParameter(':versionNo', $versionNo, PDO::PARAM_INT)
-        ;
-
+            ->setParameter(':fieldIds', $fieldIds, Connection::PARAM_INT_ARRAY);
         $statement = $selectQuery->execute();
 
-        return $statement->fetchAll(FetchMode::COLUMN);
+        $publicationIds = [];
+        $rows = $statement->fetchAll(FetchMode::ASSOCIATIVE);
+        foreach ($rows as $row) {
+            $publicationIds[$row['version']] = $row['publication_id'];
+        }
+        return $publicationIds;
     }
 
     /**

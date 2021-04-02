@@ -131,14 +131,15 @@ class FieldStorage implements FieldStorageInterface
         }
 
         $publicationIds = $this->gateway->getReferencedPublications($fieldIds, $versionInfo->versionNo);
-        $publicationIds = array_filter($publicationIds);
+        $versionPublicationId = $publicationIds[$versionInfo->versionNo] ?? null;
         $this->gateway->removePublicationReferences($fieldIds, $versionInfo->versionNo);
 
-        foreach ($publicationIds as $publicationId) {
+        $versionWithPublication = array_keys($publicationIds, $versionPublicationId);
+        if(count($versionWithPublication) <= 1 ) {
             try {
-                $this->publicationRepository->deletePublication($publicationId);
+                $this->publicationRepository->deletePublication($versionPublicationId);
             } catch (UnknownBookIDException $exception) {
-                continue;
+                return ;
             }
         }
     }
