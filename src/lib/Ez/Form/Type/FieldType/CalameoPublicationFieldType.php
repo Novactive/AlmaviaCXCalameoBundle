@@ -54,11 +54,18 @@ class CalameoPublicationFieldType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $folderChoices = [];
+        $filteredFolderChoices = [];
         $offset = 0;
         $limit = 20;
         do {
             $availableFolders = $this->accountRepository->fetchAccountFolders($limit, $offset);
             foreach ($availableFolders->items as $availableFolder) {
+                if(
+                    empty($options['available_folder_ids']) ||
+                    in_array($availableFolder->id, $options['available_folder_ids'])
+                ){
+                    $filteredFolderChoices[$availableFolder->name] = $availableFolder->id;
+                }
                 $folderChoices[$availableFolder->name] = $availableFolder->id;
             }
 
@@ -75,7 +82,7 @@ class CalameoPublicationFieldType extends AbstractType
                 'folderId',
                 ChoiceType::class,
                 [
-                    'choices' => $folderChoices,
+                    'choices' => $filteredFolderChoices,
                 ]
             )
             ->add(
@@ -106,8 +113,8 @@ class CalameoPublicationFieldType extends AbstractType
                         'folderId',
                         ChoiceType::class,
                         [
-                            'choices' => $folderChoices,
-                            'disabled' => true
+                            'choices'  => $folderChoices,
+                            'disabled' => true,
                         ]
                     );
                 }
@@ -122,6 +129,11 @@ class CalameoPublicationFieldType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(['translation_domain' => 'ezrepoforms_fieldtype']);
+        $resolver->setDefaults(
+            [
+                'translation_domain' => 'ezrepoforms_fieldtype',
+                'available_folder_ids' => [],
+            ]
+        );
     }
 }

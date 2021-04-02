@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication;
 
+use AlmaviaCX\Calameo\API\Repository\AccountRepository;
 use AlmaviaCX\Calameo\Ez\Form\Type\FieldType\CalameoPublicationFieldType;
 use eZ\Publish\API\Repository\FieldTypeService;
 use eZ\Publish\Core\FieldType\BinaryFile\Value;
@@ -21,6 +22,7 @@ use EzSystems\RepositoryForms\FieldType\DataTransformer\BinaryFileValueTransform
 use EzSystems\RepositoryForms\FieldType\FieldDefinitionFormMapperInterface;
 use EzSystems\RepositoryForms\FieldType\FieldValueFormMapperInterface;
 use EzSystems\RepositoryForms\Form\Type\FieldType\BinaryFileFieldType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -29,18 +31,46 @@ class FormMapper implements FieldValueFormMapperInterface, FieldDefinitionFormMa
     /** @var FieldTypeService */
     protected $fieldTypeService;
 
+    /** @var AccountRepository */
+    protected $accountRepository;
+
     /**
      * FormMapper constructor.
-     * @param FieldTypeService $fieldTypeService
+     *
+     * @param FieldTypeService  $fieldTypeService
+     * @param AccountRepository $accountRepository
      */
-    public function __construct(FieldTypeService $fieldTypeService)
+    public function __construct(FieldTypeService $fieldTypeService, AccountRepository $accountRepository)
     {
         $this->fieldTypeService = $fieldTypeService;
+        $this->accountRepository = $accountRepository;
     }
 
     public function mapFieldDefinitionForm(FormInterface $fieldDefinitionForm, FieldDefinitionData $data)
     {
-        // TODO: Implement mapFieldDefinitionForm() method.
+        $folderChoices = [];
+        $offset = 0;
+        $limit = 20;
+        do {
+            $availableFolders = $this->accountRepository->fetchAccountFolders($limit, $offset);
+            foreach ($availableFolders->items as $availableFolder) {
+                $folderChoices[$availableFolder->name] = $availableFolder->id;
+            }
+
+            $offset += $limit;
+        } while ($availableFolders->total > $offset);
+
+        $fieldDefinitionForm
+            ->add(
+                'availableFolderIds',
+                ChoiceType::class,
+                [
+                    'choices'       => $folderChoices,
+                    'multiple'      => true,
+                    'property_path' => 'fieldSettings[availableFolderIds]',
+                    'label'         => 'field_definition.calameo_publication.availableFolderIds',
+                ]
+            );
     }
 
     public function mapFieldValueForm(FormInterface $fieldForm, FieldData $data)
@@ -52,22 +82,23 @@ class FormMapper implements FieldValueFormMapperInterface, FieldDefinitionFormMa
         $fieldForm
             ->add(
                 $formConfig->getFormFactory()->createBuilder()
-                           ->create(
-                               'value',
-                               CalameoPublicationFieldType::class,
-                               [
-                                   'required' => $fieldDefinition->isRequired,
-                                   'label' => $fieldDefinition->getName(),
-                               ]
-                           )
-                           ->addModelTransformer(
-                               new ValueTransformer(
-                                   $fieldType,
-                                   $data->value
-                               )
-                           )
-                           ->setAutoInitialize(false)
-                           ->getForm()
+                    ->create(
+                        'value',
+                        CalameoPublicationFieldType::class,
+                        [
+                            'required' => $fieldDefinition->isRequired,
+                            'label'    => $fieldDefinition->getName(),
+                            'available_folder_ids' => $fieldDefinition->fieldSettings['availableFolderIds'] ?? []
+                        ]
+                    )
+                    ->addModelTransformer(
+                        new ValueTransformer(
+                            $fieldType,
+                            $data->value
+                        )
+                    )
+                    ->setAutoInitialize(false)
+                    ->getForm()
             );
     }
 

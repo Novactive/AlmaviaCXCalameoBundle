@@ -31,10 +31,15 @@ class LegacyConverter implements Converter
 
     public function toStorageFieldDefinition(FieldDefinition $fieldDef, StorageFieldDefinition $storageDef)
     {
+        $fieldSettings = $fieldDef->fieldTypeConstraints->fieldSettings;
+        $storageDef->dataText1 = implode('|', $fieldSettings['availableFolderIds'] ?? []);
     }
 
     public function toFieldDefinition(StorageFieldDefinition $storageDef, FieldDefinition $fieldDef)
     {
+        $fieldDef->fieldTypeConstraints->fieldSettings = [
+            'availableFolderIds' => explode('|', $storageDef->dataText1 ?? "")
+        ];
     }
 
     public function getIndexColumn()

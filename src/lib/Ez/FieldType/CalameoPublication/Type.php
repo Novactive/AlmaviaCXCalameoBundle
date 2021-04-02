@@ -16,6 +16,7 @@ use AlmaviaCX\Calameo\API\Value\Publication;
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
 use eZ\Publish\Core\Base\Exceptions\InvalidArgumentValue;
 use eZ\Publish\Core\FieldType\FieldType;
+use eZ\Publish\Core\FieldType\ValidationError;
 use eZ\Publish\SPI\FieldType\Nameable;
 use eZ\Publish\SPI\FieldType\Value as SPIValue;
 use eZ\Publish\Core\FieldType\Value as BaseValue;
@@ -24,6 +25,51 @@ use RuntimeException;
 
 class Type extends FieldType
 {
+    protected $settingsSchema = [
+        'availableFolderIds' => [
+            'type' => 'array',
+            'default' => [],
+        ],
+    ];
+
+    /**
+     * @inheritDoc
+     */
+    public function validateFieldSettings($fieldSettings)
+    {
+        $validationErrors = [];
+
+        foreach ($fieldSettings as $name => $value) {
+            if (isset($this->settingsSchema[$name])) {
+                switch ($name) {
+                    case 'availableFolderIds':
+                        if (!\is_array($value)) {
+                            $validationErrors[] = new ValidationError(
+                                "Setting '%setting%' value must be of array type",
+                                null,
+                                [
+                                    'setting' => $name,
+                                ],
+                                "[$name]"
+                            );
+                        }
+                        break;
+                }
+            } else {
+                $validationErrors[] = new ValidationError(
+                    "Setting '%setting%' is unknown",
+                    null,
+                    [
+                        'setting' => $name,
+                    ],
+                    "[$name]"
+                );
+            }
+        }
+
+        return $validationErrors;
+    }
+
     protected function createValueFromInput($inputValue)
     {
         if (is_array($inputValue)) {
