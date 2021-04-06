@@ -69,6 +69,7 @@ class FormMapper implements FieldValueFormMapperInterface, FieldDefinitionFormMa
                     'multiple'      => true,
                     'property_path' => 'fieldSettings[availableFolderIds]',
                     'label'         => 'field_definition.calameo_publication.availableFolderIds',
+                    'required'      => false
                 ]
             );
     }
