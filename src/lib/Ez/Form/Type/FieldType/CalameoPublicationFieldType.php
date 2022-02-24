@@ -14,8 +14,11 @@ namespace AlmaviaCX\Calameo\Ez\Form\Type\FieldType;
 
 use AlmaviaCX\Calameo\API\Repository\AccountRepository;
 use AlmaviaCX\Calameo\API\Repository\FolderRepository;
+use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
 use AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Value;
+use EzSystems\EzPlatformAdminUi\Notification\NotificationHandlerInterface;
 use EzSystems\RepositoryForms\Form\Type\FieldType\BinaryBaseFieldType;
+use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -31,14 +34,17 @@ class CalameoPublicationFieldType extends AbstractType
     /** @var AccountRepository */
     protected $accountRepository;
 
+    /** @var NotificationHandlerInterface */
+    protected $notificationHandler;
+
     /**
-     * CalameoPublicationFieldType constructor.
-     *
-     * @param AccountRepository $accountRepository
+     * @param AccountRepository            $accountRepository
+     * @param NotificationHandlerInterface $notificationHandler
      */
-    public function __construct(AccountRepository $accountRepository)
+    public function __construct(AccountRepository $accountRepository, NotificationHandlerInterface $notificationHandler)
     {
         $this->accountRepository = $accountRepository;
+        $this->notificationHandler = $notificationHandler;
     }
 
     public function getName()
@@ -58,7 +64,14 @@ class CalameoPublicationFieldType extends AbstractType
         $offset = 0;
         $limit = 20;
         do {
-            $availableFolders = $this->accountRepository->fetchAccountFolders($limit, $offset);
+            try {
+                $availableFolders = $this->accountRepository->fetchAccountFolders($limit, $offset);
+            } catch (ApiResponseErrorException $exception) {
+                $this->notificationHandler->error(
+                    sprintf("[Calameo] %s", $exception->getMessage())
+                );
+                break;
+            }
             foreach ($availableFolders->items as $availableFolder) {
                 if (
                     empty($options['available_folder_ids']) ||

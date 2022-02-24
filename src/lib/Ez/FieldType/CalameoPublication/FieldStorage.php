@@ -17,12 +17,14 @@ use AlmaviaCX\Calameo\API\Service\PublishingService;
 use AlmaviaCX\Calameo\API\Value\Publication;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
 use AlmaviaCX\Calameo\Exception\NotImplementedException;
+use AlmaviaCX\Calameo\Exception\Response\ApiResponseException;
 use AlmaviaCX\Calameo\Exception\Response\UnknownBookIDException;
 use AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Gateway\DoctrineStorage;
 use eZ\Publish\SPI\Persistence\Content\Field;
 use eZ\Publish\SPI\Persistence\Content\VersionInfo;
 use eZ\Publish\SPI\FieldType\FieldStorage as FieldStorageInterface;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Log\LoggerInterface;
 use SplFileInfo;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -37,21 +39,25 @@ class FieldStorage implements FieldStorageInterface
     /** @var DoctrineStorage */
     public $gateway;
 
+    /** @var LoggerInterface */
+    public $logger;
+
     /**
-     * FieldStorage constructor.
-     *
      * @param PublicationRepository $publicationRepository
      * @param PublishingService     $publishingService
      * @param DoctrineStorage       $gateway
+     * @param LoggerInterface       $logger
      */
     public function __construct(
         PublicationRepository $publicationRepository,
         PublishingService $publishingService,
-        DoctrineStorage $gateway
+        DoctrineStorage $gateway,
+        LoggerInterface $logger
     ) {
         $this->publicationRepository = $publicationRepository;
         $this->publishingService = $publishingService;
         $this->gateway = $gateway;
+        $this->logger = $logger;
     }
 
     /**
@@ -139,6 +145,9 @@ class FieldStorage implements FieldStorageInterface
             try {
                 $this->publicationRepository->deletePublication($versionPublicationId);
             } catch (UnknownBookIDException $exception) {
+                return ;
+            } catch (ApiResponseErrorException $exception) {
+                $this->logger->error($exception->getMessage());
                 return ;
             }
         }

@@ -28,3 +28,5 @@ services:
       $APIKey: "$calameo.api.key;almaviacx$"
       $APISecret: "$calameo.api.secret;almaviacx$"
       $config: "$calameo.config;almaviacx$"
+
+  AlmaviaCX\Calameo\Ez\Twig\CalameoTwigExtension:

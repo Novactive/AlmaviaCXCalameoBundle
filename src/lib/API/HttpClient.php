@@ -39,7 +39,7 @@ class HttpClient extends Client
      * @param string $APISecret
      * @param array  $config
      */
-    public function __construct(string $APIKey, string $APISecret, array $config = [])
+    public function __construct(?string $APIKey, ?string $APISecret, array $config = [])
     {
         $this->APIKey = $APIKey;
         $this->APISecret = $APISecret;

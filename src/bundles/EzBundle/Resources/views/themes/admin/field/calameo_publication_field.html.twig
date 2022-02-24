@@ -2,7 +2,7 @@
 {% extends '@EzPublishCore/content_fields.html.twig' %}
 
 {% block calameo_publication_field %}
-    {% set publication = field.value.publication %}
+    {% set publication = loadCalameoPublication(field.value) %}
     {% if publication %}
         {% if publication.viewUrl %}
             <a href="{{ publication.viewUrl }}" target="_blank">{{ publication.name }} ({{ publication.id }})</a>
