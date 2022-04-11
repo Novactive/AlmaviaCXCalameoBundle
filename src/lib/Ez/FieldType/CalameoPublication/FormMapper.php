@@ -13,15 +13,18 @@ declare(strict_types=1);
 namespace AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication;
 
 use AlmaviaCX\Calameo\API\Repository\AccountRepository;
+use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
 use AlmaviaCX\Calameo\Ez\Form\Type\FieldType\CalameoPublicationFieldType;
 use eZ\Publish\API\Repository\FieldTypeService;
 use eZ\Publish\Core\FieldType\BinaryFile\Value;
+use EzSystems\EzPlatformAdminUi\Notification\NotificationHandlerInterface;
 use EzSystems\RepositoryForms\Data\Content\FieldData;
 use EzSystems\RepositoryForms\Data\FieldDefinitionData;
 use EzSystems\RepositoryForms\FieldType\DataTransformer\BinaryFileValueTransformer;
 use EzSystems\RepositoryForms\FieldType\FieldDefinitionFormMapperInterface;
 use EzSystems\RepositoryForms\FieldType\FieldValueFormMapperInterface;
 use EzSystems\RepositoryForms\Form\Type\FieldType\BinaryFileFieldType;
+use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -34,16 +37,22 @@ class FormMapper implements FieldValueFormMapperInterface, FieldDefinitionFormMa
     /** @var AccountRepository */
     protected $accountRepository;
 
+    /** @var NotificationHandlerInterface */
+    protected $notificationHandler;
+
     /**
-     * FormMapper constructor.
-     *
-     * @param FieldTypeService  $fieldTypeService
-     * @param AccountRepository $accountRepository
+     * @param FieldTypeService             $fieldTypeService
+     * @param AccountRepository            $accountRepository
+     * @param NotificationHandlerInterface $notificationHandler
      */
-    public function __construct(FieldTypeService $fieldTypeService, AccountRepository $accountRepository)
-    {
+    public function __construct(
+        FieldTypeService $fieldTypeService,
+        AccountRepository $accountRepository,
+        NotificationHandlerInterface $notificationHandler
+    ) {
         $this->fieldTypeService = $fieldTypeService;
         $this->accountRepository = $accountRepository;
+        $this->notificationHandler = $notificationHandler;
     }
 
     public function mapFieldDefinitionForm(FormInterface $fieldDefinitionForm, FieldDefinitionData $data)
@@ -52,7 +61,14 @@ class FormMapper implements FieldValueFormMapperInterface, FieldDefinitionFormMa
         $offset = 0;
         $limit = 20;
         do {
-            $availableFolders = $this->accountRepository->fetchAccountFolders($limit, $offset);
+            try {
+                $availableFolders = $this->accountRepository->fetchAccountFolders($limit, $offset);
+            } catch (ApiResponseErrorException $exception) {
+                $this->notificationHandler->error(
+                    sprintf("[Calameo] %s", $exception->getMessage())
+                );
+                break;
+            }
             foreach ($availableFolders->items as $availableFolder) {
                 $folderChoices[$availableFolder->name] = $availableFolder->id;
             }
