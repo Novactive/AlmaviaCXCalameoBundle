@@ -7,7 +7,7 @@
     "almaviacx"
   ],
   "homepage": "https://github.com/Novactive/AlmaviaCXCalameoBundle",
-  "type": "ezplatform-bundle",
+  "type": "ibexa-bundle",
   "authors": [
     {
       "name": "AlmaviaCX",
@@ -19,15 +19,8 @@
     "MIT"
   ],
   "require": {
-    "php": "^7.2",
-    "ext-json": "*",
-    "doctrine/cache": "^1.10",
-    "ezsystems/ezpublish-kernel": "^7.5",
-    "ezsystems/repository-forms": "^2.5",
-    "guzzlehttp/guzzle": "^6.0",
-    "jms/serializer": "^1.0",
-    "jms/serializer-bundle": "^2.0",
-    "symfony/symfony": "^3.4"
+    "php": "^7.4 || ^8.0",
+    "ext-json": "*"
   },
   "autoload": {
     "psr-4": {
