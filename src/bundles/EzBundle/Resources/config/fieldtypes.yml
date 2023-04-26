@@ -15,7 +15,6 @@ services:
     tags:
       - { name: ezpublish.fieldType, alias: calameo_publication }
       - { name: ibexa.field_type, alias: calameo_publication }
-      - { name: ezpublish.fieldType.nameable, alias: calameo_publication }
 
   AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\LegacyConverter:
     tags:

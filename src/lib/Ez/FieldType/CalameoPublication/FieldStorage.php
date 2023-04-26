@@ -16,31 +16,21 @@ use AlmaviaCX\Calameo\API\Repository\PublicationRepository;
 use AlmaviaCX\Calameo\API\Service\PublishingService;
 use AlmaviaCX\Calameo\API\Value\Publication;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
-use AlmaviaCX\Calameo\Exception\NotImplementedException;
-use AlmaviaCX\Calameo\Exception\Response\ApiResponseException;
 use AlmaviaCX\Calameo\Exception\Response\UnknownBookIDException;
 use AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Gateway\DoctrineStorage;
+use eZ\Publish\SPI\FieldType\FieldStorage as FieldStorageInterface;
 use eZ\Publish\SPI\Persistence\Content\Field;
 use eZ\Publish\SPI\Persistence\Content\VersionInfo;
-use eZ\Publish\SPI\FieldType\FieldStorage as FieldStorageInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use SplFileInfo;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FieldStorage implements FieldStorageInterface
 {
-    /** @var PublicationRepository */
-    public $publicationRepository;
-
-    /** @var PublishingService */
-    public $publishingService;
-
-    /** @var DoctrineStorage */
-    public $gateway;
-
-    /** @var LoggerInterface */
-    public $logger;
+    public PublicationRepository $publicationRepository;
+    public PublishingService $publishingService;
+    public DoctrineStorage $gateway;
+    public LoggerInterface $logger;
 
     /**
      * @param PublicationRepository $publicationRepository
@@ -68,7 +58,7 @@ class FieldStorage implements FieldStorageInterface
      * @throws ApiResponseErrorException
      * @throws GuzzleException
      */
-    public function storeFieldData(VersionInfo $versionInfo, Field $field, array $context)
+    public function storeFieldData(VersionInfo $versionInfo, Field $field, array $context): bool
     {
         $inputUri = $field->value->externalData['inputUri'] ?? null;
         if ($inputUri) {
