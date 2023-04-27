@@ -12,25 +12,15 @@ declare(strict_types=1);
 
 namespace AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication;
 
-use AlmaviaCX\Calameo\API\Value\Publication;
-use eZ\Publish\API\Repository\FieldType;
+use Ibexa\Contracts\Core\Repository\FieldType;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ValueTransformer implements DataTransformerInterface
 {
-    /** @var FieldType */
-    protected $fieldType;
+    protected FieldType $fieldType;
+    protected Value $initialValue;
 
-    /** @var Value */
-    protected $initialValue;
-
-    /**
-     * ValueTransformer constructor.
-     * @param FieldType $fieldType
-     * @param Value $initialValue
-     */
     public function __construct(FieldType $fieldType, Value $initialValue)
     {
         $this->fieldType = $fieldType;
@@ -38,10 +28,10 @@ class ValueTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param Value $value
+     * @param Value|null $value
      * @return array
      */
-    public function transform($value): array
+    public function transform(?Value $value): array
     {
         if (null === $value) {
             $value = $this->fieldType->getEmptyValue();
@@ -56,10 +46,10 @@ class ValueTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param array $value
+     * @param array|null $value
      * @return Value
      */
-    public function reverseTransform($value)
+    public function reverseTransform(?array $value): Value
     {
         if (!is_array($value)) {
             throw new TransformationFailedException(sprintf('Expected a array got %s', gettype($value)));

@@ -15,30 +15,21 @@ namespace AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication;
 use AlmaviaCX\Calameo\API\Repository\AccountRepository;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
 use AlmaviaCX\Calameo\Ez\Form\Type\FieldType\CalameoPublicationFieldType;
-use eZ\Publish\API\Repository\FieldTypeService;
-use eZ\Publish\Core\FieldType\BinaryFile\Value;
+use Ibexa\Contracts\Core\Repository\FieldTypeService;
+use Ibexa\AdminUi\Form\Data\FieldDefinitionData;
 use EzSystems\EzPlatformAdminUi\Notification\NotificationHandlerInterface;
 use EzSystems\RepositoryForms\Data\Content\FieldData;
-use EzSystems\RepositoryForms\Data\FieldDefinitionData;
-use EzSystems\RepositoryForms\FieldType\DataTransformer\BinaryFileValueTransformer;
 use EzSystems\RepositoryForms\FieldType\FieldDefinitionFormMapperInterface;
 use EzSystems\RepositoryForms\FieldType\FieldValueFormMapperInterface;
-use EzSystems\RepositoryForms\Form\Type\FieldType\BinaryFileFieldType;
-use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FormMapper implements FieldValueFormMapperInterface, FieldDefinitionFormMapperInterface
 {
-    /** @var FieldTypeService */
-    protected $fieldTypeService;
-
-    /** @var AccountRepository */
-    protected $accountRepository;
-
-    /** @var NotificationHandlerInterface */
-    protected $notificationHandler;
+    protected FieldTypeService $fieldTypeService;
+    protected AccountRepository $accountRepository;
+    protected NotificationHandlerInterface $notificationHandler;
 
     /**
      * @param FieldTypeService             $fieldTypeService
@@ -55,7 +46,8 @@ class FormMapper implements FieldValueFormMapperInterface, FieldDefinitionFormMa
         $this->notificationHandler = $notificationHandler;
     }
 
-    public function mapFieldDefinitionForm(FormInterface $fieldDefinitionForm, FieldDefinitionData $data)
+    // f
+    public function mapFieldDefinitionForm(FormInterface $fieldDefinitionForm, FieldDefinitionData $data): void
     {
         $folderChoices = [];
         $offset = 0;

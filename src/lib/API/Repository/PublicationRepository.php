@@ -19,14 +19,8 @@ use GuzzleHttp\Exception\GuzzleException;
 
 class PublicationRepository
 {
+    protected PublicationGateway $gateway;
 
-    /** @var PublicationGateway */
-    protected $gateway;
-
-    /**
-     * PublicationRepository constructor.
-     * @param PublicationGateway $gateway
-     */
     public function __construct(PublicationGateway $gateway)
     {
         $this->gateway = $gateway;
