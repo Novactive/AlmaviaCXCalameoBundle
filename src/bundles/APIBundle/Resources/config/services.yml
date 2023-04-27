@@ -35,4 +35,4 @@ services:
 
   AlmaviaCX\Calameo\Exception\ExceptionThrower:
 
-  JMS\Serializer\Serializer:
+  #JMS\Serializer\Serializer:
