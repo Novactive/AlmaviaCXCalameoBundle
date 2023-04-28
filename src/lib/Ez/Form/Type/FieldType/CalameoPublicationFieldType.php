@@ -15,7 +15,7 @@ namespace AlmaviaCX\Calameo\Ez\Form\Type\FieldType;
 use AlmaviaCX\Calameo\API\Repository\AccountRepository;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
 use AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Value;
-use EzSystems\RepositoryForms\Form\Type\FieldType\BinaryBaseFieldType;
+use Ibexa\ContentForms\Form\Type\FieldType\BinaryBaseFieldType;
 use Ibexa\Contracts\AdminUi\Notification\NotificationHandlerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -126,7 +126,7 @@ class CalameoPublicationFieldType extends AbstractType
         );
     }
 
-    public function getParent()
+    public function getParent(): string
     {
         return BinaryBaseFieldType::class;
     }

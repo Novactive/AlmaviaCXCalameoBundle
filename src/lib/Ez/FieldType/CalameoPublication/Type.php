@@ -21,8 +21,6 @@ use Ibexa\Core\FieldType\FieldType;
 use Ibexa\Core\FieldType\ValidationError;
 use RuntimeException;
 
-# TODO
-
 class Type extends FieldType
 {
     protected $settingsSchema = [
