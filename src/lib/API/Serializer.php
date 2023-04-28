@@ -17,9 +17,9 @@ use Psr\Http\Message\ResponseInterface;
 
 class Serializer
 {
-    protected \JMS\Serializer\Serializer $baseSerializer;
+    protected \JMS\Serializer\SerializerInterface $baseSerializer;
 
-    public function __construct(\JMS\Serializer\Serializer $baseSerializer)
+    public function __construct(\JMS\Serializer\SerializerInterface $baseSerializer)
     {
         $this->baseSerializer = $baseSerializer;
     }

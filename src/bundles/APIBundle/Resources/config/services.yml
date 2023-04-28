@@ -21,8 +21,9 @@ services:
       $config: "%almaviacx.calameo.http_client.config%"
 
   AlmaviaCX\Calameo\API\Serializer:
-#    arguments:
-#      $baseSerializer: "@jms_serializer"
+    arguments:
+      # TODO   The service "AlmaviaCX\Calameo\API\Serializer" has a dependency on a non-existent service "JMS\Serializer\SerializerInterface".
+      $baseSerializer: '@JMS\Serializer\SerializerInterface'
 
   AlmaviaCX\Calameo\API\Gateway\:
     resource: "../../../../lib/API/Gateway/*"
@@ -34,5 +35,3 @@ services:
     resource: "../../../../lib/API/Service/*"
 
   AlmaviaCX\Calameo\Exception\ExceptionThrower:
-
-  #JMS\Serializer\Serializer:
