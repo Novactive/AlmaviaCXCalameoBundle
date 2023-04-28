@@ -56,7 +56,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("string")
      * @Serializer\SerializedName("ID")
      */
-    public $id;
+    public string $id;
 
     /**
      * Publication's owner account ID (should be your account ID)
@@ -65,7 +65,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("int")
      * @Serializer\SerializedName("AccountID")
      */
-    public $accountId;
+    public int $accountId;
 
     /**
      * Publication's owner subscription ID
@@ -74,7 +74,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("int")
      * @Serializer\SerializedName("SubscriptionID")
      */
-    public $folderId;
+    public int $folderId;
 
     /**
      * Title of the publication
@@ -83,7 +83,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("string")
      * @Serializer\SerializedName("Name")
      */
-    public $name;
+    public string $name;
 
     /**
      * Description of the publication
@@ -92,7 +92,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("string")
      * @Serializer\SerializedName("Description")
      */
-    public $description;
+    public string $description;
 
     /**
      * Conversion status of the publication.
@@ -106,7 +106,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("string")
      * @Serializer\SerializedName("Status")
      */
-    public $status;
+    public string $status;
 
     /**
      * Sends 1 if the publication is private and 0 if not
@@ -115,7 +115,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("bool")
      * @Serializer\SerializedName("IsPrivate")
      */
-    public $isPrivate;
+    public bool $isPrivate;
 
     /**
      * Authentication parameter for private URLs (authid)
@@ -124,7 +124,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("string")
      * @Serializer\SerializedName("AuthID")
      */
-    public $authId;
+    public string $authId;
 
     /**
      * Sends 1 if the publication allows access to the miniCalaméo and 0 if not
@@ -133,7 +133,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("bool")
      * @Serializer\SerializedName("AllowMini")
      */
-    public $allowMini;
+    public bool $allowMini;
 
     /**
      * Number of pages of the publication
@@ -142,7 +142,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("int")
      * @Serializer\SerializedName("Pages")
      */
-    public $pages;
+    public int $pages;
 
     /**
      * Width of a page of the publication
@@ -151,7 +151,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("int")
      * @Serializer\SerializedName("Width")
      */
-    public $width;
+    public int $width;
 
     /**
      * Height of a page of the publication
@@ -160,7 +160,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("int")
      * @Serializer\SerializedName("Height")
      */
-    public $height;
+    public int $height;
 
     /**
      * Number of views of the publication
@@ -169,7 +169,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("int")
      * @Serializer\SerializedName("Views")
      */
-    public $views;
+    public int $views;
 
     /**
      * Number of downloads of the publication
@@ -178,7 +178,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("int")
      * @Serializer\SerializedName("Downloads")
      */
-    public $downloads;
+    public int $downloads;
 
     /**
      * Number of comments of the publication
@@ -187,7 +187,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("int")
      * @Serializer\SerializedName("Comments")
      */
-    public $comments;
+    public int $comments;
 
     /**
      * Number of favorites from the publication
@@ -196,7 +196,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("int")
      * @Serializer\SerializedName("Favorites")
      */
-    public $favorites;
+    public int $favorites;
 
     /**
      * Reference date of the publication
@@ -206,7 +206,7 @@ class Publication extends ResponseContent
      * @Serializer\SerializedName("Date")
      * @Serializer\Accessor(setter="setDate")
      */
-    public $date;
+    public DateTime $date;
     /**
      * Date of creation of the publication
      *
@@ -214,7 +214,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("DateTime<'Y-m-d H:i:s'>")
      * @Serializer\SerializedName("Creation")
      */
-    public $creation;
+    public DateTime $creation;
     /**
      * Scheduled date of the publication (UTC)
      *
@@ -222,7 +222,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("DateTime<'Y-m-d H:i:s'>")
      * @Serializer\SerializedName("Publication")
      */
-    public $publication;
+    public DateTime $publication;
     /**
      * Date of the last modification of the publication
      *
@@ -230,7 +230,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("DateTime<'Y-m-d H:i:s'>")
      * @Serializer\SerializedName("Modification")
      */
-    public $modification;
+    public DateTime $modification;
     /**
      * Absolute URL for the publication's larger cover
      *
@@ -238,7 +238,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("string")
      * @Serializer\SerializedName("PosterUrl")
      */
-    public $posterUrl;
+    public string $posterUrl;
     /**
      * Absolute URL for the publication's cover
      *
@@ -246,7 +246,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("string")
      * @Serializer\SerializedName("PictureUrl")
      */
-    public $pictureUrl;
+    public string $pictureUrl;
     /**
      * Absolute URL for the publication's thumbnail
      *
@@ -254,7 +254,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("string")
      * @Serializer\SerializedName("ThumbUrl")
      */
-    public $thumbUrl;
+    public string $thumbUrl;
     /**
      * Absolute URL for the publication's overview
      *
@@ -262,7 +262,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("string")
      * @Serializer\SerializedName("PublicUrl")
      */
-    public $publicUrl;
+    public string $publicUrl;
     /**
      * Absolute URL for the publication's reading page
      *
@@ -270,7 +270,7 @@ class Publication extends ResponseContent
      * @Serializer\Type("string")
      * @Serializer\SerializedName("ViewUrl")
      */
-    public $viewUrl;
+    public string $viewUrl;
 
     /**
      * @param DateTime $date

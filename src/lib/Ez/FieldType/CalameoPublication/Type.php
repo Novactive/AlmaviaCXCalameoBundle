@@ -12,15 +12,13 @@ declare(strict_types=1);
 
 namespace AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication;
 
-use AlmaviaCX\Calameo\API\Value\Publication;
-use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
-use eZ\Publish\Core\Base\Exceptions\InvalidArgumentValue;
-use eZ\Publish\Core\FieldType\FieldType;
-use eZ\Publish\Core\FieldType\ValidationError;
-use eZ\Publish\SPI\FieldType\Nameable;
-use eZ\Publish\SPI\FieldType\Value as SPIValue;
-use eZ\Publish\SPI\Persistence\Content\FieldValue as PersistenceValue;
 use Ibexa\Contracts\Core\FieldType\Value as BaseValue;
+use Ibexa\Contracts\Core\FieldType\Value as SPIValue;
+use Ibexa\Contracts\Core\Persistence\Content\FieldValue as PersistenceValue;
+use Ibexa\Contracts\Core\Repository\Values\ContentType\FieldDefinition;
+use Ibexa\Core\Base\Exceptions\InvalidArgumentValue;
+use Ibexa\Core\FieldType\FieldType;
+use Ibexa\Core\FieldType\ValidationError;
 use RuntimeException;
 
 class Type extends FieldType

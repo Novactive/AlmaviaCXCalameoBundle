@@ -22,13 +22,8 @@ use GuzzleHttp\Exception\GuzzleException;
 
 class FolderRepository
 {
-    /** @var FolderGateway */
-    protected $gateway;
+    protected FolderGateway $gateway;
 
-    /**
-     * SubscriptionRepository constructor.
-     * @param FolderGateway $gateway
-     */
     public function __construct(FolderGateway $gateway)
     {
         $this->gateway = $gateway;

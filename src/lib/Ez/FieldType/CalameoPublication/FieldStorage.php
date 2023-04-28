@@ -18,9 +18,9 @@ use AlmaviaCX\Calameo\API\Value\Publication;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
 use AlmaviaCX\Calameo\Exception\Response\UnknownBookIDException;
 use AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Gateway\DoctrineStorage;
-use eZ\Publish\SPI\FieldType\FieldStorage as FieldStorageInterface;
-use eZ\Publish\SPI\Persistence\Content\Field;
-use eZ\Publish\SPI\Persistence\Content\VersionInfo;
+use Ibexa\Contracts\Core\FieldType\FieldStorage as FieldStorageInterface;
+use Ibexa\Contracts\Core\Persistence\Content\Field;
+use Ibexa\Contracts\Core\Persistence\Content\VersionInfo;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use SplFileInfo;
@@ -118,7 +118,8 @@ class FieldStorage implements FieldStorageInterface
      * @param VersionInfo $versionInfo
      * @param array $fieldIds
      * @param array $context
-     * @return bool|void
+     * @return void
+     * @throws GuzzleException
      */
     public function deleteFieldData(VersionInfo $versionInfo, array $fieldIds, array $context): void
     {
@@ -155,23 +156,14 @@ class FieldStorage implements FieldStorageInterface
      * @param VersionInfo $versionInfo
      * @param Field $field
      * @param array $context
-     * @return \eZ\Publish\SPI\Search\Field[]|void
+     * @return \Ibexa\Contracts\Core\Search\Field[]|void
      */
     public function getIndexData(VersionInfo $versionInfo, Field $field, array $context)
     {
     }
 
-    public function copyLegacyField(VersionInfo $versionInfo, Field $field, Field $originalField, array $context)
+    public function copyLegacyField(VersionInfo $versionInfo, Field $field, Field $originalField, array $context): bool
     {
-//        if ($field->id !== $originalField->id) {
-//            var_dump([
-//                $versionInfo,
-//                $field,
-//                $originalField,
-//                $context
-//            ]);
-//            die;
-//        }
         if ($originalField->value->externalData === null) {
             return false;
         }
