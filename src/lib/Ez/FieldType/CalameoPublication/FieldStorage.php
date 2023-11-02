@@ -58,7 +58,7 @@ class FieldStorage implements FieldStorageInterface
      * @throws ApiResponseErrorException
      * @throws GuzzleException
      */
-    public function storeFieldData(VersionInfo $versionInfo, Field $field, array $context): bool
+    public function storeFieldData(VersionInfo $versionInfo, Field $field, array $context): ?bool
     {
         $inputUri = $field->value->externalData['inputUri'] ?? null;
         if ($inputUri) {
@@ -86,6 +86,7 @@ class FieldStorage implements FieldStorageInterface
         }
 
         $this->gateway->storePublicationReference($versionInfo, $field);
+        return true;
     }
 
     /**

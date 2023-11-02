@@ -36,12 +36,34 @@
 {% block calameo_publication_widget_container %}
     {{- form_widget(form.publicationId) -}}
     {{- form_widget(form.folderId) -}}
+
+    {% set fieldtype = form.parent %}
+    {% set field_type_descriptions = fieldtype.vars.value.fieldDefinition.descriptions %}
     <div{% with { attr: preview_attr } %}{{ block('attributes') }}{% endwith %}>
         {{ block(preview_block_name) }}
     </div>
     <div{% with { attr: widget_wrapper_attr } %}{{ block('attributes') }}{% endwith %}>
-        <div class="ez-data-source">
+        <div class="ibexa-data-source">
             {{ block('binary_base_widget') }}
         </div>
     </div>
 {% endblock %}
+
+{#
+
+vendor/ibexa/admin-ui/src/bundle/Resources/views/themes/admin/ui/field_type/edit/binary_base.html.twig
+
+{% block binary_base_widget_container %}
+    {% set fieldtype = form.parent %}
+    {% set field_type_descriptions = fieldtype.vars.value.fieldDefinition.descriptions %}
+
+    <div{% with { attr: preview_attr } %}{{ block('attributes') }}{% endwith %}>
+        {{ block(preview_block_name) }}
+    </div>
+    <div{% with { attr: widget_wrapper_attr } %}{{ block('attributes') }}{% endwith %}>
+        <div class="ibexa-data-source">
+            {{ block('binary_base_widget') }}
+        </div>
+    </div>
+{% endblock %}
+#}

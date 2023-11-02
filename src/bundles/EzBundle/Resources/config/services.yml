@@ -22,13 +22,12 @@ services:
 
   AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Gateway\DoctrineStorage:
 
+  AlmaviaCX\Calameo\API\HttpClientFactory: ~
+
   almaviacx.calameo.httpclient.siteaccessaware:
     lazy: true
     class: AlmaviaCX\Calameo\API\HttpClient
     decorates: AlmaviaCX\Calameo\API\HttpClient
-    arguments:
-      $APIKey: "$calameo.api.key;almaviacx$"
-      $APISecret: "$calameo.api.secret;almaviacx$"
-      $config: "$calameo.config;almaviacx$"
+    factory: ['@AlmaviaCX\Calameo\API\HttpClientFactory', 'create']
 
   AlmaviaCX\Calameo\Ez\Twig\CalameoTwigExtension:

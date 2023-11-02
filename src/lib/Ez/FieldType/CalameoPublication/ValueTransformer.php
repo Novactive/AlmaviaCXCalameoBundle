@@ -31,7 +31,8 @@ class ValueTransformer implements DataTransformerInterface
      * @param Value|null $value
      * @return array
      */
-    public function transform(?Value $value): array
+    public function transform($value)
+    // must be compatible with Symfony\Component\Form\DataTransformerInterface::transform($value)
     {
         if (null === $value) {
             $value = $this->fieldType->getEmptyValue();
@@ -49,7 +50,7 @@ class ValueTransformer implements DataTransformerInterface
      * @param array|null $value
      * @return Value
      */
-    public function reverseTransform(?array $value): Value
+    public function reverseTransform($value)
     {
         if (!is_array($value)) {
             throw new TransformationFailedException(sprintf('Expected a array got %s', gettype($value)));

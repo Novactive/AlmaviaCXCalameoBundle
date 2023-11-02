@@ -18,16 +18,16 @@ use Ibexa\Core\FieldType\Value as BaseValue;
 
 class Value extends BaseValue
 {
-    public ?string $publicationId;
-    public ?int $folderId;
+    public ?string $publicationId = null;
+    public ?int $folderId = null;
     /**
      * Input file URI, as a path to a file on a disk.
      *
      * @var string|null
      */
-    public ?string $inputUri;
-    public Closure $publicationLoader;
-    protected ?Publication $publication;
+    public ?string $inputUri = null; // must not be accessed before initialization
+    public ?Closure $publicationLoader = null;
+    protected ?Publication $publication = null;
 
     /**
      * Returns a string representation of the field value.
