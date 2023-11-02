@@ -106,13 +106,25 @@ class FieldStorage implements FieldStorageInterface
         }
 
         $field->value->externalData = $publicationReferenceData;
-        $field->value->externalData['publicationLoader'] = static function () use ($repository, $field) {
+        // #111471 - [MIG-GOUV] Creation de contenu : dysfonctionnement dans la création de certains contenu
+        // https://almaviacx.easyredmine.com/issues/111471?journals=all#note-971094
+        // Lors de la publication d'un contenu on a cette erreur :
+        // > Lors de la publication d'un contenu on a cette erreur :
+        // Au lieu de set le publicationLoader on set directement la publication
+//        $field->value->externalData['publicationLoader'] = static function () use ($repository, $field) {
+//            try {
+//                return $repository->getPublicationInfos($field->value->externalData['publicationId']);
+//            } catch (UnknownBookIDException $exception) {
+//                return;
+//            }
+//        };
+        if (empty($field->value->externalData['publication'])) {
             try {
-                return $repository->getPublicationInfos($field->value->externalData['publicationId']);
+                $publication = $repository->getPublicationInfos($field->value->externalData['publicationId']);
+                $field->value->externalData['publication'] = $publication;
             } catch (UnknownBookIDException $exception) {
-                return;
             }
-        };
+        }
     }
 
     /**
