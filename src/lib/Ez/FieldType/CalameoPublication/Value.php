@@ -18,16 +18,15 @@ use Ibexa\Core\FieldType\Value as BaseValue;
 
 class Value extends BaseValue
 {
-    public ?string $publicationId;
-    public ?int $folderId;
+    public ?string $publicationId = null;
+    public ?int $folderId = null;
     /**
      * Input file URI, as a path to a file on a disk.
      *
      * @var string|null
      */
-    public ?string $inputUri;
-    public Closure $publicationLoader;
-    protected ?Publication $publication;
+    public ?string $inputUri = null;
+    protected ?Publication $publication = null;
 
     /**
      * Returns a string representation of the field value.
@@ -35,19 +34,5 @@ class Value extends BaseValue
     public function __toString(): string
     {
         return $this->publicationId;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function __get($property)
-    {
-        if ($property === "publication") {
-            if (!$this->publication && $this->publicationLoader) {
-                $loader = $this->publicationLoader;
-                $this->publication = $loader();
-            }
-        }
-        return parent::__get($property);
     }
 }
