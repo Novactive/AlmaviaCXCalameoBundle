@@ -1,6 +1,6 @@
 (function (global) {
-    const SELECTOR_FIELD = '.ez-field-edit--calameo_publication';
-    const SELECTOR_LABEL_WRAPPER = '.ez-field-edit__label-wrapper';
+    const SELECTOR_FIELD = '.ibexa-field-edit--calameo_publication';
+    const SELECTOR_LABEL_WRAPPER = '.ibexa-field-edit__label-wrapper';
 
     class CalameoPublicationPreviewField extends global.eZ.BasePreviewField {
         /**
@@ -9,14 +9,14 @@
          * @param {Event} event
          */
         loadDroppedFilePreview(event) {
-            const preview = this.fieldContainer.querySelector('.ez-field-edit__preview');
-            const nameContainer = preview.querySelector('.ez-field-edit-preview__file-name');
+            const preview = this.fieldContainer.querySelector('.ibexa-field-edit__preview');
+            const nameContainer = preview.querySelector('.ibexa-field-edit-preview__file-name');
             const files = [].slice.call(event.target.files);
 
             nameContainer.innerHTML = files[0].name;
             nameContainer.title = files[0].name;
 
-            preview.querySelector('.ez-field-edit-preview__action--preview').href = URL.createObjectURL(files[0]);
+            preview.querySelector('.ibexa-field-edit-preview__action--preview').href = URL.createObjectURL(files[0]);
         }
     }
 

@@ -26,7 +26,6 @@ class Value extends BaseValue
      * @var string|null
      */
     public ?string $inputUri = null; // must not be accessed before initialization
-    public ?Closure $publicationLoader = null;
     protected ?Publication $publication = null;
 
     /**
@@ -35,19 +34,5 @@ class Value extends BaseValue
     public function __toString(): string
     {
         return $this->publicationId;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function __get($property)
-    {
-        if ($property === "publication") {
-            if (!$this->publication && $this->publicationLoader) {
-                $loader = $this->publicationLoader;
-                $this->publication = $loader();
-            }
-        }
-        return parent::__get($property);
     }
 }

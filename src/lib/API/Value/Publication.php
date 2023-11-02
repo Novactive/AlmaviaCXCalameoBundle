@@ -15,11 +15,12 @@ namespace AlmaviaCX\Calameo\API\Value;
 use DateTime;
 use JMS\Serializer\Annotation as Serializer;
 use AlmaviaCX\Calameo\API\Value\Response\ResponseContent;
-use SplFileInfo;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\VarExporter\LazyGhostTrait;
 
 class Publication extends ResponseContent
 {
+    use LazyGhostTrait;
+
     /** @var string Title of the publication */
     public const SORT_NAME = "Name";
     /** @var string Number of pages of the publication */

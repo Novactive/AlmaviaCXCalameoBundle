@@ -107,20 +107,39 @@ class FieldStorage implements FieldStorageInterface
 
         $field->value->externalData = $publicationReferenceData;
         // #111471 - [MIG-GOUV] Creation de contenu : dysfonctionnement dans la création de certains contenu
-        // https://almaviacx.easyredmine.com/issues/111471?journals=all#note-971094
-        // Lors de la publication d'un contenu on a cette erreur :
-        // > Lors de la publication d'un contenu on a cette erreur :
-        // Au lieu de set le publicationLoader on set directement la publication
-//        $field->value->externalData['publicationLoader'] = static function () use ($repository, $field) {
-//            try {
-//                return $repository->getPublicationInfos($field->value->externalData['publicationId']);
-//            } catch (UnknownBookIDException $exception) {
-//                return;
-//            }
-//        };
+        // https://almaviacx.easyredmine.com/issues/111471?journals=all
         if (empty($field->value->externalData['publication'])) {
             try {
-                $publication = $repository->getPublicationInfos($field->value->externalData['publicationId']);
+                $publication = Publication::createLazyGhost(function (Publication $instance) use ($field, $repository) {
+                    // $instance est une instance "Vide" !
+                    $publication = $repository->getPublicationInfos($field->value->externalData['publicationId']);
+
+                    $instance->id = $publication->id;
+                    $instance->accountId = $publication->accountId;
+                    $instance->folderId = $publication->folderId;
+                    $instance->name = $publication->name;
+                    $instance->description = $publication->description;
+                    $instance->status = $publication->status;
+                    $instance->isPrivate = $publication->isPrivate;
+                    $instance->authId = $publication->authId;
+                    $instance->allowMini = $publication->allowMini;
+                    $instance->pages = $publication->pages;
+                    $instance->width = $publication->width;
+                    $instance->height = $publication->height;
+                    $instance->views = $publication->views;
+                    $instance->downloads = $publication->downloads;
+                    $instance->comments = $publication->comments;
+                    $instance->favorites = $publication->favorites;
+                    $instance->date = $publication->date;
+                    $instance->creation = $publication->creation;
+                    $instance->publication = $publication->publication;
+                    $instance->modification = $publication->modification;
+                    $instance->posterUrl = $publication->posterUrl;
+                    $instance->pictureUrl = $publication->pictureUrl;
+                    $instance->thumbUrl = $publication->thumbUrl;
+                    $instance->publicUrl = $publication->publicUrl;
+                    $instance->viewUrl = $publication->viewUrl;
+                });
                 $field->value->externalData['publication'] = $publication;
             } catch (UnknownBookIDException $exception) {
             }
