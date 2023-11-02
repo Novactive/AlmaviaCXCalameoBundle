@@ -25,7 +25,7 @@ class Value extends BaseValue
      *
      * @var string|null
      */
-    public ?string $inputUri = null; // must not be accessed before initialization
+    public ?string $inputUri = null;
     protected ?Publication $publication = null;
 
     /**

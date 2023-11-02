@@ -32,7 +32,6 @@ class ValueTransformer implements DataTransformerInterface
      * @return array
      */
     public function transform($value)
-    // must be compatible with Symfony\Component\Form\DataTransformerInterface::transform($value)
     {
         if (null === $value) {
             $value = $this->fieldType->getEmptyValue();
