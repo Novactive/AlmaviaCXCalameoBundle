@@ -109,10 +109,11 @@ class FieldStorage implements FieldStorageInterface
         // #111471 - [MIG-GOUV] Creation de contenu : dysfonctionnement dans la création de certains contenu
         // https://almaviacx.easyredmine.com/issues/111471?journals=all
         if (empty($field->value->externalData['publication'])) {
-            try {
-                $publication = Publication::createLazyGhost(function (Publication $instance) use ($field, $repository) {
-                    // $instance est une instance "Vide" !
-                    $publication = $repository->getPublicationInfos($field->value->externalData['publicationId']);
+            $publication = Publication::createLazyGhost(function (Publication $instance) use ($field, $repository) {
+                // $instance est une instance "Vide".
+                try {
+                    $publicationId = $field->value->externalData['publicationId'];
+                    $publication = $repository->getPublicationInfos($publicationId);
 
                     $instance->id = $publication->id;
                     $instance->accountId = $publication->accountId;
@@ -139,10 +140,14 @@ class FieldStorage implements FieldStorageInterface
                     $instance->thumbUrl = $publication->thumbUrl;
                     $instance->publicUrl = $publication->publicUrl;
                     $instance->viewUrl = $publication->viewUrl;
-                });
-                $field->value->externalData['publication'] = $publication;
-            } catch (UnknownBookIDException $exception) {
-            }
+                } catch (UnknownBookIDException $exception) {
+                    $this->logger->warning('UnknownBookIDException ' . $exception->getMessage(), [
+                        __METHOD__ . ' ' . __LINE__,
+                        '$publicationId' => $publicationId,
+                    ]);
+                }
+            });
+            $field->value->externalData['publication'] = $publication;
         }
     }
 
