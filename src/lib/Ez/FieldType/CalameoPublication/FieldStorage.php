@@ -100,19 +100,20 @@ class FieldStorage implements FieldStorageInterface
     {
         $repository = $this->publicationRepository;
 
-         $publicationReferenceData = $this->gateway->getPublicationReferenceData($field->id, $versionInfo->versionNo);
+        $publicationReferenceData = $this->gateway->getPublicationReferenceData($field->id, $versionInfo->versionNo);
         if ($publicationReferenceData === null || !$publicationReferenceData['publicationId']) {
             return;
         }
 
         $field->value->externalData = $publicationReferenceData;
+        
         // #111471 - [MIG-GOUV] Creation de contenu : dysfonctionnement dans la création de certains contenu
         // https://almaviacx.easyredmine.com/issues/111471?journals=all
-        if (empty($field->value->externalData['publication'])) {
-            $publication = Publication::createLazyGhost(function (Publication $instance) use ($field, $repository) {
-                // $instance est une instance "Vide".
+        $publicationId = $field->value->externalData['publicationId'] ?? null;
+        if (empty($field->value->externalData['publication']) && $publicationId) {
+            $publication = Publication::createLazyGhost(function (Publication $instance) use ($publicationId, $repository) {
+                // $instance est une instance "Vide" de Publication.
                 try {
-                    $publicationId = $field->value->externalData['publicationId'];
                     $publication = $repository->getPublicationInfos($publicationId);
 
                     $instance->id = $publication->id;
