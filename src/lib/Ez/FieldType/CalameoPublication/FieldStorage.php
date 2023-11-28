@@ -16,6 +16,7 @@ use AlmaviaCX\Calameo\API\Repository\PublicationRepository;
 use AlmaviaCX\Calameo\API\Service\PublishingService;
 use AlmaviaCX\Calameo\API\Value\Publication;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
+use AlmaviaCX\Calameo\Exception\Response\MissingOrIncorrectParameterException;
 use AlmaviaCX\Calameo\Exception\Response\UnknownBookIDException;
 use AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Gateway\DoctrineStorage;
 use Ibexa\Contracts\Core\FieldType\FieldStorage as FieldStorageInterface;
@@ -143,6 +144,11 @@ class FieldStorage implements FieldStorageInterface
                     $instance->viewUrl = $publication->viewUrl;
                 } catch (UnknownBookIDException $exception) {
                     $this->logger->warning('UnknownBookIDException ' . $exception->getMessage(), [
+                        __METHOD__ . ' ' . __LINE__,
+                        '$publicationId' => $publicationId,
+                    ]);
+                } catch (MissingOrIncorrectParameterException $exception) {
+                    $this->logger->warning('MissingOrIncorrectParameterException ' . $exception->getMessage(), [
                         __METHOD__ . ' ' . __LINE__,
                         '$publicationId' => $publicationId,
                     ]);
