@@ -15,6 +15,7 @@ services:
     public: false
 
   AlmaviaCX\Calameo\API\HttpClient:
+    lazy: true
     arguments:
       $APIKey: "%almaviacx.calameo.api.key%"
       $APISecret: "%almaviacx.calameo.api.secret%"
