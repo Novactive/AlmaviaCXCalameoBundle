@@ -13,9 +13,9 @@ services:
     # this means you cannot fetch services directly from the container via $container->get()
     # if you need to do this, you can override this setting on individual services
     public: false
-    lazy: true
 
   AlmaviaCX\Calameo\API\HttpClient:
+    lazy: true
     arguments:
       $APIKey: "%almaviacx.calameo.api.key%"
       $APISecret: "%almaviacx.calameo.api.secret%"
