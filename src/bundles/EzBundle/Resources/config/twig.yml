@@ -1,2 +1,2 @@
 form_themes:
-    - '@ezdesign/fieldtypes/edit/calameo_publication.html.twig'
+    - '@ibexadesign/fieldtypes/edit/calameo_publication.html.twig'

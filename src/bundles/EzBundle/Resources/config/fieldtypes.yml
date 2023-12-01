@@ -14,17 +14,20 @@ services:
   AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Type:
     tags:
       - { name: ezpublish.fieldType, alias: calameo_publication }
-      - { name: ezpublish.fieldType.nameable, alias: calameo_publication }
+      - { name: ibexa.field_type, alias: calameo_publication }
 
   AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\LegacyConverter:
     tags:
       - { name: ezpublish.storageEngine.legacy.converter, alias: calameo_publication }
+      - { name: ibexa.field_type.storage.legacy.converter, alias: calameo_publication }
 
   AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\FieldStorage:
     tags:
       - { name: ezpublish.fieldType.externalStorageHandler, alias: calameo_publication }
+      - { name: ibexa.field_type.storage.external.handler, alias: calameo_publication }
 
   almaviacx.calameo.fieldtype.indexable.calameo_publication:
-    class: "%ezpublish.fieldType.indexable.unindexed.class%"
+    class: Ibexa\Core\FieldType\Unindexed
     tags:
       - { name: ezpublish.fieldType.indexable, alias: calameo_publication }
+      - { name: ibexa.field_type.indexable, alias: calameo_publication }

@@ -12,24 +12,20 @@ namespace AlmaviaCX\Calameo\Ez\Twig;
 use AlmaviaCX\Calameo\API\Value\Publication;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
 use AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Value;
-use EzSystems\EzPlatformAdminUi\Notification\NotificationHandlerInterface;
+use Ibexa\Contracts\AdminUi\Notification\NotificationHandlerInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class CalameoTwigExtension extends AbstractExtension
 {
-    /** @var NotificationHandlerInterface */
-    protected $notificationHandler;
+    protected NotificationHandlerInterface $notificationHandler;
 
-    /**
-     * @param NotificationHandlerInterface $notificationHandler
-     */
     public function __construct(NotificationHandlerInterface $notificationHandler)
     {
         $this->notificationHandler = $notificationHandler;
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('loadCalameoPublication', [$this, 'loadCalameoPublication']),

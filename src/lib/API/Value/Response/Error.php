@@ -20,11 +20,11 @@ class Error
      * @var int
      * @Serializer\Type("int")
      */
-    public $code;
+    public int $code;
 
     /**
      * @var string
      * @Serializer\Type("string")
      */
-    public $message;
+    public string $message;
 }

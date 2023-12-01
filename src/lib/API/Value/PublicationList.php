@@ -20,5 +20,5 @@ class PublicationList extends ContentList
      * @var Publication[]
      * @Serializer\Type("array<AlmaviaCX\Calameo\API\Value\Publication>")
      */
-    public $items;
+    public array $items;
 }

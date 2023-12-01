@@ -20,5 +20,5 @@ class FolderList extends ContentList
      * @var Folder[]
      * @Serializer\Type("array<AlmaviaCX\Calameo\API\Value\Folder>")
      */
-    public $items;
+    public array $items;
 }

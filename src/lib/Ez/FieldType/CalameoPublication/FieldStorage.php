@@ -16,31 +16,22 @@ use AlmaviaCX\Calameo\API\Repository\PublicationRepository;
 use AlmaviaCX\Calameo\API\Service\PublishingService;
 use AlmaviaCX\Calameo\API\Value\Publication;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
-use AlmaviaCX\Calameo\Exception\NotImplementedException;
-use AlmaviaCX\Calameo\Exception\Response\ApiResponseException;
+use AlmaviaCX\Calameo\Exception\Response\MissingOrIncorrectParameterException;
 use AlmaviaCX\Calameo\Exception\Response\UnknownBookIDException;
 use AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Gateway\DoctrineStorage;
-use eZ\Publish\SPI\Persistence\Content\Field;
-use eZ\Publish\SPI\Persistence\Content\VersionInfo;
-use eZ\Publish\SPI\FieldType\FieldStorage as FieldStorageInterface;
+use Ibexa\Contracts\Core\FieldType\FieldStorage as FieldStorageInterface;
+use Ibexa\Contracts\Core\Persistence\Content\Field;
+use Ibexa\Contracts\Core\Persistence\Content\VersionInfo;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use SplFileInfo;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FieldStorage implements FieldStorageInterface
 {
-    /** @var PublicationRepository */
-    public $publicationRepository;
-
-    /** @var PublishingService */
-    public $publishingService;
-
-    /** @var DoctrineStorage */
-    public $gateway;
-
-    /** @var LoggerInterface */
-    public $logger;
+    public PublicationRepository $publicationRepository;
+    public PublishingService $publishingService;
+    public DoctrineStorage $gateway;
+    public LoggerInterface $logger;
 
     /**
      * @param PublicationRepository $publicationRepository
@@ -68,7 +59,7 @@ class FieldStorage implements FieldStorageInterface
      * @throws ApiResponseErrorException
      * @throws GuzzleException
      */
-    public function storeFieldData(VersionInfo $versionInfo, Field $field, array $context)
+    public function storeFieldData(VersionInfo $versionInfo, Field $field, array $context): ?bool
     {
         $inputUri = $field->value->externalData['inputUri'] ?? null;
         if ($inputUri) {
@@ -96,6 +87,7 @@ class FieldStorage implements FieldStorageInterface
         }
 
         $this->gateway->storePublicationReference($versionInfo, $field);
+        return true;
     }
 
     /**
@@ -109,26 +101,69 @@ class FieldStorage implements FieldStorageInterface
     {
         $repository = $this->publicationRepository;
 
-         $publicationReferenceData = $this->gateway->getPublicationReferenceData($field->id, $versionInfo->versionNo);
+        $publicationReferenceData = $this->gateway->getPublicationReferenceData($field->id, $versionInfo->versionNo);
         if ($publicationReferenceData === null || !$publicationReferenceData['publicationId']) {
             return;
         }
 
         $field->value->externalData = $publicationReferenceData;
-        $field->value->externalData['publicationLoader'] = static function () use ($repository, $field) {
-            try {
-                return $repository->getPublicationInfos($field->value->externalData['publicationId']);
-            } catch (UnknownBookIDException $exception) {
-                return;
-            }
-        };
+        
+        // #111471 - [MIG-GOUV] Creation de contenu : dysfonctionnement dans la création de certains contenu
+        // https://almaviacx.easyredmine.com/issues/111471?journals=all
+        $publicationId = $field->value->externalData['publicationId'] ?? null;
+        if (empty($field->value->externalData['publication']) && $publicationId) {
+            $publication = Publication::createLazyGhost(function (Publication $instance) use ($publicationId, $repository) {
+                // $instance est une instance "Vide" de Publication.
+                try {
+                    $publication = $repository->getPublicationInfos($publicationId);
+
+                    $instance->id = $publication->id;
+                    $instance->accountId = $publication->accountId;
+                    $instance->folderId = $publication->folderId;
+                    $instance->name = $publication->name;
+                    $instance->description = $publication->description;
+                    $instance->status = $publication->status;
+                    $instance->isPrivate = $publication->isPrivate;
+                    $instance->authId = $publication->authId;
+                    $instance->allowMini = $publication->allowMini;
+                    $instance->pages = $publication->pages;
+                    $instance->width = $publication->width;
+                    $instance->height = $publication->height;
+                    $instance->views = $publication->views;
+                    $instance->downloads = $publication->downloads;
+                    $instance->comments = $publication->comments;
+                    $instance->favorites = $publication->favorites;
+                    $instance->date = $publication->date;
+                    $instance->creation = $publication->creation;
+                    $instance->publication = $publication->publication;
+                    $instance->modification = $publication->modification;
+                    $instance->posterUrl = $publication->posterUrl;
+                    $instance->pictureUrl = $publication->pictureUrl;
+                    $instance->thumbUrl = $publication->thumbUrl;
+                    $instance->publicUrl = $publication->publicUrl;
+                    $instance->viewUrl = $publication->viewUrl;
+                } catch (UnknownBookIDException $exception) {
+                    $this->logger->warning('UnknownBookIDException ' . $exception->getMessage(), [
+                        __METHOD__ . ' ' . __LINE__,
+                        '$publicationId' => $publicationId,
+                    ]);
+                } catch (MissingOrIncorrectParameterException $exception) {
+                    $this->logger->warning('MissingOrIncorrectParameterException ' . $exception->getMessage(), [
+                        __METHOD__ . ' ' . __LINE__,
+                        '$publicationId' => $publicationId,
+                    ]);
+                }
+            });
+            $field->value->externalData['publication'] = $publication;
+        }
     }
 
     /**
      * @param VersionInfo $versionInfo
      * @param array $fieldIds
      * @param array $context
-     * @return bool|void
+     * @return void
+     * @throws GuzzleException
      */
     public function deleteFieldData(VersionInfo $versionInfo, array $fieldIds, array $context): void
     {
@@ -165,23 +200,14 @@ class FieldStorage implements FieldStorageInterface
      * @param VersionInfo $versionInfo
      * @param Field $field
      * @param array $context
-     * @return \eZ\Publish\SPI\Search\Field[]|void
+     * @return \Ibexa\Contracts\Core\Search\Field[]|void
      */
     public function getIndexData(VersionInfo $versionInfo, Field $field, array $context)
     {
     }
 
-    public function copyLegacyField(VersionInfo $versionInfo, Field $field, Field $originalField, array $context)
+    public function copyLegacyField(VersionInfo $versionInfo, Field $field, Field $originalField, array $context): bool
     {
-//        if ($field->id !== $originalField->id) {
-//            var_dump([
-//                $versionInfo,
-//                $field,
-//                $originalField,
-//                $context
-//            ]);
-//            die;
-//        }
         if ($originalField->value->externalData === null) {
             return false;
         }

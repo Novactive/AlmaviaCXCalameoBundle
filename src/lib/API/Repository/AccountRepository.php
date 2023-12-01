@@ -21,13 +21,8 @@ use GuzzleHttp\Exception\GuzzleException;
 
 class AccountRepository
 {
-    /** @var AccountGateway */
-    protected $gateway;
+    protected AccountGateway $gateway;
 
-    /**
-     * AccountRepository constructor.
-     * @param AccountGateway $gateway
-     */
     public function __construct(AccountGateway $gateway)
     {
         $this->gateway = $gateway;

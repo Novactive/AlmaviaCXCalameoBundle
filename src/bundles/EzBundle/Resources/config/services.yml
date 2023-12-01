@@ -15,18 +15,19 @@ services:
     tags:
       - { name: ez.fieldFormMapper.definition, fieldType: calameo_publication }
       - { name: ez.fieldFormMapper.value, fieldType: calameo_publication }
+      - { name: ibexa.admin_ui.field_type.form.mapper.definition, fieldType: calameo_publication }
+      - { name: ibexa.admin_ui.field_type.form.mapper.value, fieldType: calameo_publication }
 
   AlmaviaCX\Calameo\Ez\Form\Type\FieldType\CalameoPublicationFieldType:
 
   AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Gateway\DoctrineStorage:
 
+  AlmaviaCX\Calameo\API\HttpClientFactory: ~
+
   almaviacx.calameo.httpclient.siteaccessaware:
     lazy: true
     class: AlmaviaCX\Calameo\API\HttpClient
     decorates: AlmaviaCX\Calameo\API\HttpClient
-    arguments:
-      $APIKey: "$calameo.api.key;almaviacx$"
-      $APISecret: "$calameo.api.secret;almaviacx$"
-      $config: "$calameo.config;almaviacx$"
+    factory: ['@AlmaviaCX\Calameo\API\HttpClientFactory', 'create']
 
   AlmaviaCX\Calameo\Ez\Twig\CalameoTwigExtension:
