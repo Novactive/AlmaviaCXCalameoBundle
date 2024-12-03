@@ -18,10 +18,11 @@ use AlmaviaCX\Calameo\API\Value\Publication;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
 use AlmaviaCX\Calameo\Exception\Response\UnknownBookIDException;
 use AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Gateway\DoctrineStorage;
+use Doctrine\DBAL\Exception;
+use GuzzleHttp\Exception\GuzzleException;
 use Ibexa\Contracts\Core\FieldType\FieldStorage as FieldStorageInterface;
 use Ibexa\Contracts\Core\Persistence\Content\Field;
 use Ibexa\Contracts\Core\Persistence\Content\VersionInfo;
-use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use SplFileInfo;
 
@@ -53,35 +54,50 @@ class FieldStorage implements FieldStorageInterface
     /**
      * @param VersionInfo $versionInfo
      * @param Field $field
-     * @param array $context
+     * @param array $context ["identifier" => "LegacyStorage"]
      * @return bool
      * @throws ApiResponseErrorException
      * @throws GuzzleException
+     * @throws Exception
      */
     public function storeFieldData(VersionInfo $versionInfo, Field $field, array $context): ?bool
     {
         $inputUri = $field->value->externalData['inputUri'] ?? null;
         if ($inputUri) {
             $file = new SplFileInfo($inputUri);
-            try {
-                if ($field->value->externalData['publicationId'] === null) {
-                    throw new UnknownBookIDException();
+            if ($field->value->externalData['publicationId'] === null) {
+                $folderId = $field->value->externalData['folderId'];
+                if (!$folderId) { // null ou 0
+                    // Est-ce possible ?
+                    $this->logger->error(sprintf('[Calameo] FolderId is %s',
+                        $folderId === null ? 'null' : $folderId
+                    ));
                 }
-                $publication = $this->publishingService->revise(
-                    $field->value->externalData['publicationId'],
-                    $file
-                );
-            } catch (UnknownBookIDException $exception) {
+
+                $name = $versionInfo->contentInfo->name;
+                // $name === '' car le contenu n'est pas encore enregistré.
+                // Du coup calaméo va mettre : "Custom Filename"
+                if (!$name) {
+                    $name = 'c' . $versionInfo->contentInfo->id; //
+                }
+
+                // Création
                 $publication = $this->publishingService->publish(
-                    $field->value->externalData['folderId'],
+                    $folderId,
                     $file,
                     [
-                        'name' => $versionInfo->contentInfo->name,
+                        'name' => $name, // expected to be of type "string"
                         'is_published' => 1,
                         'publishing_mode' => Publication::PUBLISHING_MODE_PUBLIC,
                     ]
                 );
                 $field->value->externalData['publicationId'] = $publication->id;
+            } else {
+                // Modification
+                $this->publishingService->revise(
+                    $field->value->externalData['publicationId'],
+                    $file
+                );
             }
         }
 
@@ -93,62 +109,16 @@ class FieldStorage implements FieldStorageInterface
      * @param VersionInfo $versionInfo
      * @param Field $field
      * @param array $context
-     * @throws ApiResponseErrorException
-     * @throws GuzzleException
+     * @throws Exception
      */
     public function getFieldData(VersionInfo $versionInfo, Field $field, array $context): void
     {
-        $repository = $this->publicationRepository;
-
         $publicationReferenceData = $this->gateway->getPublicationReferenceData($field->id, $versionInfo->versionNo);
-        if ($publicationReferenceData === null || !$publicationReferenceData['publicationId']) {
-            return;
-        }
-
-        $field->value->externalData = $publicationReferenceData;
-        
-        // #111471 - [MIG-GOUV] Creation de contenu : dysfonctionnement dans la création de certains contenu
-        // https://almaviacx.easyredmine.com/issues/111471?journals=all
-        $publicationId = $field->value->externalData['publicationId'] ?? null;
-        if (empty($field->value->externalData['publication']) && $publicationId) {
-            $publication = Publication::createLazyGhost(function (Publication $instance) use ($publicationId, $repository) {
-                // $instance est une instance "Vide" de Publication.
-                try {
-                    $publication = $repository->getPublicationInfos($publicationId);
-
-                    $instance->id = $publication->id;
-                    $instance->accountId = $publication->accountId;
-                    $instance->folderId = $publication->folderId;
-                    $instance->name = $publication->name;
-                    $instance->description = $publication->description;
-                    $instance->status = $publication->status;
-                    $instance->isPrivate = $publication->isPrivate;
-                    $instance->authId = $publication->authId;
-                    $instance->allowMini = $publication->allowMini;
-                    $instance->pages = $publication->pages;
-                    $instance->width = $publication->width;
-                    $instance->height = $publication->height;
-                    $instance->views = $publication->views;
-                    $instance->downloads = $publication->downloads;
-                    $instance->comments = $publication->comments;
-                    $instance->favorites = $publication->favorites;
-                    $instance->date = $publication->date;
-                    $instance->creation = $publication->creation;
-                    $instance->publication = $publication->publication;
-                    $instance->modification = $publication->modification;
-                    $instance->posterUrl = $publication->posterUrl;
-                    $instance->pictureUrl = $publication->pictureUrl;
-                    $instance->thumbUrl = $publication->thumbUrl;
-                    $instance->publicUrl = $publication->publicUrl;
-                    $instance->viewUrl = $publication->viewUrl;
-                } catch (UnknownBookIDException $exception) {
-                    $this->logger->warning('UnknownBookIDException ' . $exception->getMessage(), [
-                        __METHOD__ . ' ' . __LINE__,
-                        '$publicationId' => $publicationId,
-                    ]);
-                }
-            });
-            $field->value->externalData['publication'] = $publication;
+        if ($publicationReferenceData
+        && !empty($publicationReferenceData['publicationId'])
+        && !empty($publicationReferenceData['folderId'])
+        ) {
+            $field->value->externalData = $publicationReferenceData;
         }
     }
 
@@ -165,7 +135,7 @@ class FieldStorage implements FieldStorageInterface
             return;
         }
 
-        $publicationIds = $this->gateway->getReferencedPublications($fieldIds, $versionInfo->versionNo);
+        $publicationIds = $this->gateway->getReferencedPublications($fieldIds);
         $versionPublicationId = $publicationIds[$versionInfo->versionNo] ?? null;
         $this->gateway->removePublicationReferences($fieldIds, $versionInfo->versionNo);
 
