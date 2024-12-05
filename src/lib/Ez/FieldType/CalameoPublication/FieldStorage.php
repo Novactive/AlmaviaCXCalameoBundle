@@ -16,6 +16,7 @@ use AlmaviaCX\Calameo\API\Repository\PublicationRepository;
 use AlmaviaCX\Calameo\API\Service\PublishingService;
 use AlmaviaCX\Calameo\API\Value\Publication;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
+use AlmaviaCX\Calameo\Exception\Response\MissingOrIncorrectParameterException;
 use AlmaviaCX\Calameo\Exception\Response\UnknownBookIDException;
 use AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Gateway\DoctrineStorage;
 use Doctrine\DBAL\Exception;
