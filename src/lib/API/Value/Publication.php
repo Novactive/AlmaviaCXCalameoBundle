@@ -15,11 +15,11 @@ namespace AlmaviaCX\Calameo\API\Value;
 use DateTime;
 use JMS\Serializer\Annotation as Serializer;
 use AlmaviaCX\Calameo\API\Value\Response\ResponseContent;
-use Symfony\Component\VarExporter\LazyGhostTrait;
+use Symfony\Component\DependencyInjection\Loader\Configurator\Traits\LazyTrait;
 
 class Publication extends ResponseContent
 {
-    use LazyGhostTrait;
+    use LazyTrait;
 
     /** @var string Title of the publication */
     public const SORT_NAME = "Name";
