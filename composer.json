@@ -27,7 +27,7 @@
     "ibexa/oss": "^5",
     "jms/serializer-bundle": "^5.5",
     "nyholm/psr7": "^1.8",
-    "symfony/var-exporter": "^8.0"
+    "symfony/var-exporter": "|^6.0|^7.0|^8.0"
   },
   "autoload": {
     "psr-4": {
