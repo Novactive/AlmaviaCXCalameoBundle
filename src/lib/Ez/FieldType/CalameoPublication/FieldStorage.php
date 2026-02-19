@@ -54,12 +54,12 @@ class FieldStorage implements FieldStorageInterface
     /**
      * @param VersionInfo $versionInfo
      * @param Field $field
-     * @param array $context
      * @return bool
      * @throws ApiResponseErrorException
-     * @throws GuzzleException
+     * @throws GuzzleException|\Doctrine\DBAL\Exception
      */
-    public function storeFieldData(VersionInfo $versionInfo, Field $field, array $context): ?bool
+    public function storeFieldData(VersionInfo $versionInfo, Field $field): bool
+//    public function storeFieldData(VersionInfo $versionInfo, Field $field, array $context): ?bool
     {
         $inputUri = $field->value->externalData['inputUri'] ?? null;
         if ($inputUri) {
@@ -93,11 +93,10 @@ class FieldStorage implements FieldStorageInterface
     /**
      * @param VersionInfo $versionInfo
      * @param Field $field
-     * @param array $context
      * @throws ApiResponseErrorException
-     * @throws GuzzleException
+     * @throws GuzzleException|\Doctrine\DBAL\Exception
      */
-    public function getFieldData(VersionInfo $versionInfo, Field $field, array $context): void
+    public function getFieldData(VersionInfo $versionInfo, Field $field,): void
     {
         $repository = $this->publicationRepository;
 
@@ -107,65 +106,64 @@ class FieldStorage implements FieldStorageInterface
         }
 
         $field->value->externalData = $publicationReferenceData;
-        
+
         // #111471 - [MIG-GOUV] Creation de contenu : dysfonctionnement dans la création de certains contenu
         // https://almaviacx.easyredmine.com/issues/111471?journals=all
         $publicationId = $field->value->externalData['publicationId'] ?? null;
-        if (empty($field->value->externalData['publication']) && $publicationId) {
-            $publication = Publication::createLazyGhost(function (Publication $instance) use ($publicationId, $repository) {
-                // $instance est une instance "Vide" de Publication.
-                try {
-                    $publication = $repository->getPublicationInfos($publicationId);
-
-                    $instance->id = $publication->id;
-                    $instance->accountId = $publication->accountId;
-                    $instance->folderId = $publication->folderId;
-                    $instance->name = $publication->name;
-                    $instance->description = $publication->description;
-                    $instance->status = $publication->status;
-                    $instance->isPrivate = $publication->isPrivate;
-                    $instance->authId = $publication->authId;
-                    $instance->allowMini = $publication->allowMini;
-                    $instance->pages = $publication->pages;
-                    $instance->width = $publication->width;
-                    $instance->height = $publication->height;
-                    $instance->views = $publication->views;
-                    $instance->downloads = $publication->downloads;
-                    $instance->comments = $publication->comments;
-                    $instance->favorites = $publication->favorites;
-                    $instance->date = $publication->date;
-                    $instance->creation = $publication->creation;
-                    $instance->publication = $publication->publication;
-                    $instance->modification = $publication->modification;
-                    $instance->posterUrl = $publication->posterUrl;
-                    $instance->pictureUrl = $publication->pictureUrl;
-                    $instance->thumbUrl = $publication->thumbUrl;
-                    $instance->publicUrl = $publication->publicUrl;
-                    $instance->viewUrl = $publication->viewUrl;
-                } catch (UnknownBookIDException $exception) {
-                    $this->logger->warning('UnknownBookIDException ' . $exception->getMessage(), [
-                        __METHOD__ . ' ' . __LINE__,
-                        '$publicationId' => $publicationId,
-                    ]);
-                } catch (MissingOrIncorrectParameterException $exception) {
-                    $this->logger->warning('MissingOrIncorrectParameterException ' . $exception->getMessage(), [
-                        __METHOD__ . ' ' . __LINE__,
-                        '$publicationId' => $publicationId,
-                    ]);
-                }
-            });
-            $field->value->externalData['publication'] = $publication;
-        }
+//        if (empty($field->value->externalData['publication']) && $publicationId) {
+//            $publication = Publication::(function (Publication $instance) use ($publicationId, $repository) {
+//                // $instance est une instance "Vide" de Publication.
+//                try {
+//                    $publication = $repository->getPublicationInfos($publicationId);
+//
+//                    $instance->id = $publication->id;
+//                    $instance->accountId = $publication->accountId;
+//                    $instance->folderId = $publication->folderId;
+//                    $instance->name = $publication->name;
+//                    $instance->description = $publication->description;
+//                    $instance->status = $publication->status;
+//                    $instance->isPrivate = $publication->isPrivate;
+//                    $instance->authId = $publication->authId;
+//                    $instance->allowMini = $publication->allowMini;
+//                    $instance->pages = $publication->pages;
+//                    $instance->width = $publication->width;
+//                    $instance->height = $publication->height;
+//                    $instance->views = $publication->views;
+//                    $instance->downloads = $publication->downloads;
+//                    $instance->comments = $publication->comments;
+//                    $instance->favorites = $publication->favorites;
+//                    $instance->date = $publication->date;
+//                    $instance->creation = $publication->creation;
+//                    $instance->publication = $publication->publication;
+//                    $instance->modification = $publication->modification;
+//                    $instance->posterUrl = $publication->posterUrl;
+//                    $instance->pictureUrl = $publication->pictureUrl;
+//                    $instance->thumbUrl = $publication->thumbUrl;
+//                    $instance->publicUrl = $publication->publicUrl;
+//                    $instance->viewUrl = $publication->viewUrl;
+//                } catch (UnknownBookIDException $exception) {
+//                    $this->logger->warning('UnknownBookIDException ' . $exception->getMessage(), [
+//                        __METHOD__ . ' ' . __LINE__,
+//                        '$publicationId' => $publicationId,
+//                    ]);
+//                } catch (MissingOrIncorrectParameterException $exception) {
+//                    $this->logger->warning('MissingOrIncorrectParameterException ' . $exception->getMessage(), [
+//                        __METHOD__ . ' ' . __LINE__,
+//                        '$publicationId' => $publicationId,
+//                    ]);
+//                }
+//            });
+//            $field->value->externalData['publication'] = $publication;
+//        }
     }
 
     /**
      * @param VersionInfo $versionInfo
      * @param array $fieldIds
-     * @param array $context
      * @return void
-     * @throws GuzzleException
+     * @throws GuzzleException|\Doctrine\DBAL\Exception
      */
-    public function deleteFieldData(VersionInfo $versionInfo, array $fieldIds, array $context): void
+    public function deleteFieldData(VersionInfo $versionInfo, array $fieldIds): void
     {
         if (empty($fieldIds)) {
             return;

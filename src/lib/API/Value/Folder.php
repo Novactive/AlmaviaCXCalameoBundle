@@ -19,13 +19,13 @@ use AlmaviaCX\Calameo\API\Value\Response\ResponseContent;
 class Folder extends ResponseContent
 {
     /** @var string Title of the publication */
-    public const SORT_NAME = 'Name';
+    public const string SORT_NAME = 'Name';
 
     /** @var string Date of creation */
-    public const SORT_CREATION = 'Creation';
+    public const string SORT_CREATION = 'Creation';
 
     /** @var string Date the folder was last modified */
-    public const SORT_MODIFICATION = 'Modification';
+    public const string SORT_MODIFICATION = 'Modification';
 
     /**
      * Unique identifying key for the folder

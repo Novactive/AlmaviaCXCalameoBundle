@@ -14,6 +14,6 @@ namespace AlmaviaCX\Calameo\API\Value\Request;
 
 class SortOrder
 {
-    public const UP = "UP";
-    public const DOWN = "DOWN";
+    public const string UP = "UP";
+    public const string DOWN = "DOWN";
 }

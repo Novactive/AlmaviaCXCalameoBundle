@@ -22,33 +22,33 @@ class Publication extends ResponseContent
     use LazyTrait;
 
     /** @var string Title of the publication */
-    public const SORT_NAME = "Name";
+    public const string SORT_NAME = "Name";
     /** @var string Number of pages of the publication */
-    public const SORT_PAGES = "Pages";
+    public const string SORT_PAGES = "Pages";
     /** @var string Number of comments on the publication */
-    public const SORT_COMMENTS = "Comments";
+    public const string SORT_COMMENTS = "Comments";
     /** @var string Number of times the publication was read */
-    public const SORT_VIEWS = "Views";
+    public const string SORT_VIEWS = "Views";
     /** @var string Date of publication */
-    public const SORT_DATE = "Date";
+    public const string SORT_DATE = "Date";
     /** @var string Date of creation */
-    public const SORT_CREATION = "Creation";
+    public const string SORT_CREATION = "Creation";
     /** @var string Date the publication was last modified */
-    public const SORT_MODIFICATION = "Modification";
+    public const string SORT_MODIFICATION = "Modification";
 
     /** @var string waiting to be converted */
-    public const STATUS_QUEUE = 'QUEUE';
+    public const string STATUS_QUEUE = 'QUEUE';
     /** @var string processing document */
-    public const STATUS_PROCESS = 'PROCESS';
+    public const string STATUS_PROCESS = 'PROCESS';
     /** @var string converting document */
-    public const STATUS_STORE = 'STORE';
+    public const string STATUS_STORE = 'STORE';
     /** @var string error during conversion */
-    public const STATUS_ERROR = 'ERROR';
+    public const string STATUS_ERROR = 'ERROR';
     /** @var string publication ready */
-    public const STATUS_DONE = 'DONE';
+    public const string STATUS_DONE = 'DONE';
 
-    public const PUBLISHING_MODE_PUBLIC = 1;
-    public const PUBLISHING_MODE_PRIVATE = 2;
+    public const int PUBLISHING_MODE_PUBLIC = 1;
+    public const int PUBLISHING_MODE_PRIVATE = 2;
 
     /**
      * ID of the publication

@@ -16,8 +16,8 @@ use JMS\Serializer\Annotation as Serializer;
 
 class Response
 {
-    public const TYPE_OK ="ok";
-    public const TYPE_ERROR ="error";
+    public const string TYPE_OK ="ok";
+    public const string TYPE_ERROR ="error";
 
     /**
      * @var string
