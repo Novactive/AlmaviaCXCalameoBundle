@@ -45,9 +45,13 @@ class CalameoTwigExtension extends AbstractExtension
                 return $this->publicationRepository->getPublicationInfos($value->publicationId);
             } catch (UnknownBookIDException $unknownBookIDException) {
                 $this->notificationHandler->warning(
-                    sprintf("[Calameo] %s", $unknownBookIDException->getMessage()) // Unknown book
+                    sprintf("[Calameo][UnknownBookIDException] %s", $unknownBookIDException->getMessage()) // Unknown book
                 );
             } catch (ApiResponseErrorException $exception) {
+                $this->notificationHandler->error(
+                    sprintf("[Calameo][ApiResponseErrorException] %s", $exception->getMessage())
+                );
+            } catch (\Exception $exception) {
                 $this->notificationHandler->error(
                     sprintf("[Calameo] %s", $exception->getMessage())
                 );
