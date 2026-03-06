@@ -9,5 +9,11 @@
         {% else %}
             {{ publication.name }} ({{ publication.id }})
         {% endif %}
+    {% else %}
+        <p style="color: orange">ERREUR CALAMEO</p>
+        <pre style="color: grey">
+            publicationId : {{ field.value.publicationId|default }}
+            folderId : {{ field.value.folderId|default }}
+        </pre>
     {% endif %}
 {% endblock %}
