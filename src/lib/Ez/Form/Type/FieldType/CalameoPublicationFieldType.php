@@ -57,7 +57,7 @@ class CalameoPublicationFieldType extends AbstractType
         do {
             try {
                 $availableFolders = $this->accountRepository->fetchAccountFolders($limit, $offset);
-            } catch (ApiResponseErrorException $exception) {
+            } catch (\GuzzleHttp\Exception\ClientException|ApiResponseErrorException $exception) {
                 $this->notificationHandler->error(
                     sprintf("[Calameo] %s", $exception->getMessage())
                 );
