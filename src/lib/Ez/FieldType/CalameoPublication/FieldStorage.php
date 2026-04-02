@@ -16,7 +16,7 @@ use AlmaviaCX\Calameo\API\Repository\PublicationRepository;
 use AlmaviaCX\Calameo\API\Service\PublishingService;
 use AlmaviaCX\Calameo\API\Value\Publication;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
-use AlmaviaCX\Calameo\Exception\Response\MissingOrIncorrectParameterException;
+use AlmaviaCX\Calameo\Exception\CalameoResponseContentMustBePublication;
 use AlmaviaCX\Calameo\Exception\Response\UnknownBookIDException;
 use AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Gateway\DoctrineStorage;
 use Doctrine\DBAL\Exception;
@@ -55,15 +55,10 @@ class FieldStorage implements FieldStorageInterface
     /**
      * @param VersionInfo $versionInfo
      * @param Field $field
-     * @param array $context ["identifier" => "LegacyStorage"]
      * @return bool
-     * @throws ApiResponseErrorException
-     * @throws GuzzleException
-     * @throws Exception
-     * @throws GuzzleException|\Doctrine\DBAL\Exception
+     * @throws ApiResponseErrorException|GuzzleException|Exception|CalameoResponseContentMustBePublication
      */
     public function storeFieldData(VersionInfo $versionInfo, Field $field): bool
-//    public function storeFieldData(VersionInfo $versionInfo, Field $field, array $context): ?bool
     {
         $inputUri = $field->value->externalData['inputUri'] ?? null;
         if ($inputUri) {
@@ -129,7 +124,7 @@ class FieldStorage implements FieldStorageInterface
      * @param VersionInfo $versionInfo
      * @param array $fieldIds
      * @return void
-     * @throws GuzzleException|\Doctrine\DBAL\Exception
+     * @throws GuzzleException|Exception
      */
     public function deleteFieldData(VersionInfo $versionInfo, array $fieldIds): void
     {
