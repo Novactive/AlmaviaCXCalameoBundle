@@ -15,6 +15,7 @@ namespace AlmaviaCX\Calameo\Ez\Form\Type\FieldType;
 use AlmaviaCX\Calameo\API\Repository\AccountRepository;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
 use AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Value;
+use GuzzleHttp\Exception\ClientException;
 use Ibexa\ContentForms\Form\Type\FieldType\BinaryBaseFieldType;
 use Ibexa\Contracts\AdminUi\Notification\NotificationHandlerInterface;
 use Symfony\Component\Form\AbstractType;
@@ -57,7 +58,7 @@ class CalameoPublicationFieldType extends AbstractType
         do {
             try {
                 $availableFolders = $this->accountRepository->fetchAccountFolders($limit, $offset);
-            } catch (ApiResponseErrorException $exception) {
+            } catch (ClientException|ApiResponseErrorException $exception) {
                 $this->notificationHandler->error(
                     sprintf("[Calameo] %s", $exception->getMessage())
                 );
