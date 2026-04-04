@@ -9,27 +9,29 @@ declare(strict_types=1);
 
 namespace AlmaviaCX\Calameo\Ez\Twig;
 
+use AlmaviaCX\Calameo\API\Repository\PublicationRepository;
 use AlmaviaCX\Calameo\API\Value\Publication;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
+use AlmaviaCX\Calameo\Exception\Response\UnknownBookIDException;
 use AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Value;
-use EzSystems\EzPlatformAdminUi\Notification\NotificationHandlerInterface;
+use Ibexa\Contracts\AdminUi\Notification\NotificationHandlerInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class CalameoTwigExtension extends AbstractExtension
 {
-    /** @var NotificationHandlerInterface */
-    protected $notificationHandler;
+    protected NotificationHandlerInterface $notificationHandler;
+    protected PublicationRepository $publicationRepository;
 
-    /**
-     * @param NotificationHandlerInterface $notificationHandler
-     */
-    public function __construct(NotificationHandlerInterface $notificationHandler)
-    {
+    public function __construct(
+        NotificationHandlerInterface   $notificationHandler,
+        PublicationRepository $publicationRepository
+    ) {
+        $this->publicationRepository = $publicationRepository;
         $this->notificationHandler = $notificationHandler;
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('loadCalameoPublication', [$this, 'loadCalameoPublication']),
@@ -38,12 +40,22 @@ class CalameoTwigExtension extends AbstractExtension
 
     public function loadCalameoPublication(Value $value): ?Publication
     {
-        try {
-            return $value->publication;
-        } catch (ApiResponseErrorException $exception) {
-            $this->notificationHandler->error(
-                sprintf("[Calameo] %s", $exception->getMessage())
-            );
+        if ($value->folderId && $value->publicationId) {
+            try {
+                return $this->publicationRepository->getPublicationInfos($value->publicationId);
+            } catch (UnknownBookIDException $unknownBookIDException) {
+                $this->notificationHandler->warning(
+                    sprintf("[Calameo][UnknownBookIDException] %s", $unknownBookIDException->getMessage()) // Unknown book
+                );
+            } catch (ApiResponseErrorException $exception) {
+                $this->notificationHandler->error(
+                    sprintf("[Calameo][ApiResponseErrorException] %s", $exception->getMessage())
+                );
+            } catch (\Exception $exception) {
+                $this->notificationHandler->error(
+                    sprintf("[Calameo] %s", $exception->getMessage())
+                );
+            }
         }
         return null;
     }

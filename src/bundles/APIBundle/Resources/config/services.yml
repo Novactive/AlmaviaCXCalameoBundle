@@ -15,6 +15,7 @@ services:
     public: false
 
   AlmaviaCX\Calameo\API\HttpClient:
+    lazy: true
     arguments:
       $APIKey: "%almaviacx.calameo.api.key%"
       $APISecret: "%almaviacx.calameo.api.secret%"
@@ -22,7 +23,7 @@ services:
 
   AlmaviaCX\Calameo\API\Serializer:
     arguments:
-      $baseSerializer: "@jms_serializer"
+      $baseSerializer: '@JMS\Serializer\SerializerInterface'
 
   AlmaviaCX\Calameo\API\Gateway\:
     resource: "../../../../lib/API/Gateway/*"
@@ -32,3 +33,5 @@ services:
 
   AlmaviaCX\Calameo\API\Service\:
     resource: "../../../../lib/API/Service/*"
+
+  AlmaviaCX\Calameo\Exception\ExceptionThrower:

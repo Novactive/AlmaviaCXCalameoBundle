@@ -21,23 +21,10 @@ use GuzzleHttp\Exception\GuzzleException;
 
 abstract class AbstractGateway
 {
+    protected HttpClient $client;
+    protected Serializer $serializer;
+    protected ExceptionThrower $exceptionThrower;
 
-    /** @var HttpClient */
-    protected $client;
-
-    /** @var Serializer */
-    protected $serializer;
-
-    /** @var ExceptionThrower */
-    protected $exceptionThrower;
-
-    /**
-     * AbstractGateway constructor.
-     *
-     * @param HttpClient       $client
-     * @param Serializer       $serializer
-     * @param ExceptionThrower $exceptionThrower
-     */
     public function __construct(
         HttpClient $client,
         Serializer $serializer,
@@ -49,11 +36,11 @@ abstract class AbstractGateway
     }
 
     /**
-     * @param string      $action
+     * @param string $action
      * @param string|null $responseContentType
-     * @param array       $requestParameters
-     * @param string      $method
-     *
+     * @param array $requestParameters
+     * @param string $method
+     * @param array $options
      * @return Response
      * @throws ApiResponseErrorException
      * @throws GuzzleException

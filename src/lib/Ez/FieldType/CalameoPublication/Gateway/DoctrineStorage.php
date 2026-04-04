@@ -13,17 +13,17 @@ declare(strict_types=1);
 namespace AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Gateway;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\FetchMode;
 use Doctrine\DBAL\Query\QueryBuilder;
-use eZ\Publish\SPI\FieldType\StorageGateway;
-use eZ\Publish\SPI\Persistence\Content\Field;
-use eZ\Publish\SPI\Persistence\Content\VersionInfo;
+use Ibexa\Contracts\Core\FieldType\StorageGateway;
+use Ibexa\Contracts\Core\Persistence\Content\Field;
+use Ibexa\Contracts\Core\Persistence\Content\VersionInfo;
 use PDO;
 
 class DoctrineStorage extends StorageGateway
 {
-    /** @var Connection */
-    protected $connection;
+    protected Connection $connection;
 
     /**
      * DoctrineStorage constructor.
@@ -37,10 +37,11 @@ class DoctrineStorage extends StorageGateway
     /**
      * Store the file reference in $field for $versionNo.
      *
-     * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
-     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param VersionInfo $versionInfo
+     * @param Field $field
      *
      * @return bool
+     * @throws Exception
      */
     public function storePublicationReference(VersionInfo $versionInfo, Field $field)
     {
@@ -62,9 +63,9 @@ class DoctrineStorage extends StorageGateway
      * add additional columns to be set in the database. Please do not forget
      * to call the parent when overwriting this method.
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder $queryBuilder
-     * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
-     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param QueryBuilder $queryBuilder
+     * @param VersionInfo $versionInfo
+     * @param Field $field
      */
     protected function setInsertColumns(QueryBuilder $queryBuilder, VersionInfo $versionInfo, Field $field)
     {
@@ -81,9 +82,9 @@ class DoctrineStorage extends StorageGateway
     }
 
     /**
-     * @param \Doctrine\DBAL\Query\QueryBuilder $queryBuilder
-     * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
-     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param QueryBuilder $queryBuilder
+     * @param VersionInfo $versionInfo
+     * @param Field $field
      */
     protected function setUpdateColumns(QueryBuilder $queryBuilder, VersionInfo $versionInfo, Field $field)
     {
@@ -100,8 +101,9 @@ class DoctrineStorage extends StorageGateway
     }
 
     /**
-     * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
-     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param VersionInfo $versionInfo
+     * @param Field $field
+     * @throws Exception
      */
     protected function updateFieldData(VersionInfo $versionInfo, Field $field)
     {
@@ -132,8 +134,9 @@ class DoctrineStorage extends StorageGateway
     }
 
     /**
-     * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
-     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param VersionInfo $versionInfo
+     * @param Field $field
+     * @throws Exception
      */
     protected function storeNewFieldData(VersionInfo $versionInfo, Field $field)
     {
@@ -155,7 +158,7 @@ class DoctrineStorage extends StorageGateway
      *
      * @return mixed
      */
-    protected function castToPropertyValue($value, $columnName)
+    protected function castToPropertyValue($value, string $columnName)
     {
         $propertyMap = $this->getPropertyMapping();
         $castFunction = $propertyMap[$columnName]['cast'];
@@ -170,7 +173,7 @@ class DoctrineStorage extends StorageGateway
      * add additional columns to be fetched from the database. Please do not
      * forget to call the parent when overwriting this method.
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder $queryBuilder
+     * @param QueryBuilder $queryBuilder
      * @param int $fieldId
      * @param int $versionNo
      */
@@ -189,8 +192,9 @@ class DoctrineStorage extends StorageGateway
      * @param int $versionNo
      *
      * @return array|null
+     * @throws Exception
      */
-    public function getPublicationReferenceData(int $fieldId, int $versionNo)
+    public function getPublicationReferenceData(int $fieldId, int $versionNo): ?array
     {
         $selectQuery = $this->connection->createQueryBuilder();
 
@@ -236,8 +240,9 @@ class DoctrineStorage extends StorageGateway
      * @param array $fieldIds
      *
      * @return array
+     * @throws Exception
      */
-    public function getReferencedPublications(array $fieldIds)
+    public function getReferencedPublications(array $fieldIds): array
     {
         if (empty($fieldIds)) {
             return [];
@@ -274,7 +279,7 @@ class DoctrineStorage extends StorageGateway
      *
      * @return string
      */
-    protected function toPropertyName($columnName)
+    protected function toPropertyName(string $columnName): string
     {
         $propertyMap = $this->getPropertyMapping();
 
@@ -286,8 +291,9 @@ class DoctrineStorage extends StorageGateway
      *
      * @param array $fieldIds
      * @param int $versionNo
+     * @throws Exception
      */
-    public function removePublicationReferences(array $fieldIds, $versionNo)
+    public function removePublicationReferences(array $fieldIds, int $versionNo)
     {
         if (empty($fieldIds)) {
             return;
@@ -320,7 +326,7 @@ class DoctrineStorage extends StorageGateway
      *
      * @return array
      */
-    protected function getPropertyMapping()
+    protected function getPropertyMapping(): array
     {
         return [
             'publication_id' => [

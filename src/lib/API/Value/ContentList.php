@@ -22,17 +22,17 @@ abstract class ContentList extends ResponseContent
      * @var int
      * @Serializer\Type("int")
      */
-    public $total;
+    public int $total;
 
     /**
      * @var int
      * @Serializer\Type("int")
      */
-    public $start;
+    public int $start;
 
     /**
      * @var int
      * @Serializer\Type("int")
      */
-    public $step;
+    public int $step;
 }

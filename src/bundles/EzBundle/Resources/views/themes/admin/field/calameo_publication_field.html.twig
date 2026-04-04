@@ -1,5 +1,5 @@
 {# @var publication \AlmaviaCX\Calameo\API\Value\Publication #}
-{% extends '@EzPublishCore/content_fields.html.twig' %}
+{% extends '@IbexaCore/content_fields.html.twig' %}
 
 {% block calameo_publication_field %}
     {% set publication = loadCalameoPublication(field.value) %}
@@ -9,5 +9,11 @@
         {% else %}
             {{ publication.name }} ({{ publication.id }})
         {% endif %}
+    {% else %}
+        <p style="color: orange">ERREUR CALAMEO</p>
+        <pre style="color: grey">
+            publicationId : {{ field.value.publicationId|default }}
+            folderId : {{ field.value.folderId|default }}
+        </pre>
     {% endif %}
 {% endblock %}

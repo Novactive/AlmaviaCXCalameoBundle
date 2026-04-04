@@ -35,12 +35,12 @@ class EzCalameoExtension extends Extension implements PrependExtensionInterface
     /**
      * Allow an extension to prepend the extension configurations.
      *
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     * @param ContainerBuilder $container
      */
     public function prepend(ContainerBuilder $container)
     {
         $configs = [
-            'field_templates.yml'    => 'ezpublish',
+            'field_templates.yml'    => 'ibexa',
             'twig.yml'    => 'twig',
         ];
 

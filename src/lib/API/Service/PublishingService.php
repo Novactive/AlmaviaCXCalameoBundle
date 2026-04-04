@@ -21,13 +21,8 @@ use SplFileInfo;
 
 class PublishingService
 {
-    /** @var UploadGateway */
-    protected $gateway;
+    protected UploadGateway $gateway;
 
-    /**
-     * PublishingService constructor.
-     * @param UploadGateway $gateway
-     */
     public function __construct(UploadGateway $gateway)
     {
         $this->gateway = $gateway;

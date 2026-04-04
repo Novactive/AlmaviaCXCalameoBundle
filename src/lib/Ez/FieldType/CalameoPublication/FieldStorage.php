@@ -16,31 +16,23 @@ use AlmaviaCX\Calameo\API\Repository\PublicationRepository;
 use AlmaviaCX\Calameo\API\Service\PublishingService;
 use AlmaviaCX\Calameo\API\Value\Publication;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
-use AlmaviaCX\Calameo\Exception\NotImplementedException;
-use AlmaviaCX\Calameo\Exception\Response\ApiResponseException;
+use AlmaviaCX\Calameo\Exception\Response\MissingOrIncorrectParameterException;
 use AlmaviaCX\Calameo\Exception\Response\UnknownBookIDException;
 use AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Gateway\DoctrineStorage;
-use eZ\Publish\SPI\Persistence\Content\Field;
-use eZ\Publish\SPI\Persistence\Content\VersionInfo;
-use eZ\Publish\SPI\FieldType\FieldStorage as FieldStorageInterface;
+use Doctrine\DBAL\Exception;
 use GuzzleHttp\Exception\GuzzleException;
+use Ibexa\Contracts\Core\FieldType\FieldStorage as FieldStorageInterface;
+use Ibexa\Contracts\Core\Persistence\Content\Field;
+use Ibexa\Contracts\Core\Persistence\Content\VersionInfo;
 use Psr\Log\LoggerInterface;
 use SplFileInfo;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FieldStorage implements FieldStorageInterface
 {
-    /** @var PublicationRepository */
-    public $publicationRepository;
-
-    /** @var PublishingService */
-    public $publishingService;
-
-    /** @var DoctrineStorage */
-    public $gateway;
-
-    /** @var LoggerInterface */
-    public $logger;
+    public PublicationRepository $publicationRepository;
+    public PublishingService $publishingService;
+    public DoctrineStorage $gateway;
+    public LoggerInterface $logger;
 
     /**
      * @param PublicationRepository $publicationRepository
@@ -63,72 +55,80 @@ class FieldStorage implements FieldStorageInterface
     /**
      * @param VersionInfo $versionInfo
      * @param Field $field
-     * @param array $context
+     * @param array $context ["identifier" => "LegacyStorage"]
      * @return bool
      * @throws ApiResponseErrorException
      * @throws GuzzleException
+     * @throws Exception
      */
-    public function storeFieldData(VersionInfo $versionInfo, Field $field, array $context)
+    public function storeFieldData(VersionInfo $versionInfo, Field $field, array $context): ?bool
     {
         $inputUri = $field->value->externalData['inputUri'] ?? null;
         if ($inputUri) {
             $file = new SplFileInfo($inputUri);
-            try {
-                if ($field->value->externalData['publicationId'] === null) {
-                    throw new UnknownBookIDException();
+            if ($field->value->externalData['publicationId'] === null) {
+                $folderId = $field->value->externalData['folderId'];
+                if (!$folderId) { // null ou 0
+                    // Est-ce possible ?
+                    $this->logger->error(sprintf('[Calameo] FolderId is %s',
+                        $folderId === null ? 'null' : $folderId
+                    ));
                 }
-                $publication = $this->publishingService->revise(
-                    $field->value->externalData['publicationId'],
-                    $file
-                );
-            } catch (UnknownBookIDException $exception) {
+
+                $name = $versionInfo->contentInfo->name;
+                // $name === '' car le contenu n'est pas encore enregistré.
+                // Du coup calaméo va mettre : "Custom Filename"
+                if (!$name) {
+                    $name = 'c' . $versionInfo->contentInfo->id; //
+                }
+
+                // Création
                 $publication = $this->publishingService->publish(
-                    $field->value->externalData['folderId'],
+                    $folderId,
                     $file,
                     [
-                        'name' => $versionInfo->contentInfo->name,
+                        'name' => $name, // expected to be of type "string"
                         'is_published' => 1,
                         'publishing_mode' => Publication::PUBLISHING_MODE_PUBLIC,
                     ]
                 );
                 $field->value->externalData['publicationId'] = $publication->id;
+            } else {
+                // Modification
+                $this->publishingService->revise(
+                    $field->value->externalData['publicationId'],
+                    $file
+                );
             }
         }
 
         $this->gateway->storePublicationReference($versionInfo, $field);
+        return true;
     }
 
     /**
      * @param VersionInfo $versionInfo
      * @param Field $field
      * @param array $context
-     * @throws ApiResponseErrorException
-     * @throws GuzzleException
+     * @throws Exception
      */
     public function getFieldData(VersionInfo $versionInfo, Field $field, array $context): void
     {
-        $repository = $this->publicationRepository;
-
-         $publicationReferenceData = $this->gateway->getPublicationReferenceData($field->id, $versionInfo->versionNo);
-        if ($publicationReferenceData === null || !$publicationReferenceData['publicationId']) {
-            return;
+        $publicationReferenceData = $this->gateway->getPublicationReferenceData($field->id, $versionInfo->versionNo);
+        if ($publicationReferenceData
+        && !empty($publicationReferenceData['publicationId'])
+        && !empty($publicationReferenceData['folderId'])
+        ) {
+            $field->value->externalData = $publicationReferenceData;
         }
-
-        $field->value->externalData = $publicationReferenceData;
-        $field->value->externalData['publicationLoader'] = static function () use ($repository, $field) {
-            try {
-                return $repository->getPublicationInfos($field->value->externalData['publicationId']);
-            } catch (UnknownBookIDException $exception) {
-                return;
-            }
-        };
     }
 
     /**
      * @param VersionInfo $versionInfo
      * @param array $fieldIds
      * @param array $context
-     * @return bool|void
+     * @return void
+     * @throws GuzzleException
      */
     public function deleteFieldData(VersionInfo $versionInfo, array $fieldIds, array $context): void
     {
@@ -136,7 +136,7 @@ class FieldStorage implements FieldStorageInterface
             return;
         }
 
-        $publicationIds = $this->gateway->getReferencedPublications($fieldIds, $versionInfo->versionNo);
+        $publicationIds = $this->gateway->getReferencedPublications($fieldIds);
         $versionPublicationId = $publicationIds[$versionInfo->versionNo] ?? null;
         $this->gateway->removePublicationReferences($fieldIds, $versionInfo->versionNo);
 
@@ -165,23 +165,14 @@ class FieldStorage implements FieldStorageInterface
      * @param VersionInfo $versionInfo
      * @param Field $field
      * @param array $context
-     * @return \eZ\Publish\SPI\Search\Field[]|void
+     * @return \Ibexa\Contracts\Core\Search\Field[]|void
      */
     public function getIndexData(VersionInfo $versionInfo, Field $field, array $context)
     {
     }
 
-    public function copyLegacyField(VersionInfo $versionInfo, Field $field, Field $originalField, array $context)
+    public function copyLegacyField(VersionInfo $versionInfo, Field $field, Field $originalField, array $context): bool
     {
-//        if ($field->id !== $originalField->id) {
-//            var_dump([
-//                $versionInfo,
-//                $field,
-//                $originalField,
-//                $context
-//            ]);
-//            die;
-//        }
         if ($originalField->value->externalData === null) {
             return false;
         }

@@ -12,15 +12,13 @@ declare(strict_types=1);
 
 namespace AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication;
 
-use AlmaviaCX\Calameo\API\Value\Publication;
-use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
-use eZ\Publish\Core\Base\Exceptions\InvalidArgumentValue;
-use eZ\Publish\Core\FieldType\FieldType;
-use eZ\Publish\Core\FieldType\ValidationError;
-use eZ\Publish\SPI\FieldType\Nameable;
-use eZ\Publish\SPI\FieldType\Value as SPIValue;
-use eZ\Publish\Core\FieldType\Value as BaseValue;
-use eZ\Publish\SPI\Persistence\Content\FieldValue as PersistenceValue;
+use Ibexa\Contracts\Core\FieldType\Value as BaseValue;
+use Ibexa\Contracts\Core\FieldType\Value as SPIValue;
+use Ibexa\Contracts\Core\Persistence\Content\FieldValue as PersistenceValue;
+use Ibexa\Contracts\Core\Repository\Values\ContentType\FieldDefinition;
+use Ibexa\Core\Base\Exceptions\InvalidArgumentValue;
+use Ibexa\Core\FieldType\FieldType;
+use Ibexa\Core\FieldType\ValidationError;
 use RuntimeException;
 
 class Type extends FieldType
@@ -35,7 +33,7 @@ class Type extends FieldType
     /**
      * @inheritDoc
      */
-    public function validateFieldSettings($fieldSettings)
+    public function validateFieldSettings($fieldSettings): array
     {
         $validationErrors = [];
 
@@ -99,23 +97,26 @@ class Type extends FieldType
         }
     }
 
-    public function getFieldTypeIdentifier()
+    public function getFieldTypeIdentifier(): string
     {
         return "calameo_publication";
     }
 
     /**
-     * @param Value $value
-     * @return string|void
+     * @param BaseValue $value
+     * @param FieldDefinition $fieldDefinition
+     * @param string $languageCode
+     * @return string
      */
-    public function getName(SPIValue $value)
+    public function getName(BaseValue $value, FieldDefinition $fieldDefinition, string $languageCode): string
     {
+        // return (string)$value->text;
         throw new RuntimeException(
             'Name generation provided via NameableField set via "ezpublish.fieldType.nameable" service tag'
         );
     }
 
-    public function getEmptyValue()
+    public function getEmptyValue(): Value
     {
         return new Value();
     }
@@ -133,7 +134,7 @@ class Type extends FieldType
      * @param Value $value
      * @return array
      */
-    public function toHash(SPIValue $value)
+    public function toHash(SPIValue $value): ?array
     {
         if ($this->isEmptyValue($value)) {
             return null;
@@ -147,9 +148,9 @@ class Type extends FieldType
 
     /**
      * @param Value $value
-     * @return string|null
+     * @return false
      */
-    protected function getSortInfo(BaseValue $value)
+    protected function getSortInfo(BaseValue $value): bool
     {
         return false;
     }
@@ -183,6 +184,6 @@ class Type extends FieldType
             return $this->getEmptyValue();
         }
 
-        return new Value($fieldValue->externalData ?? []);
+        return new Value($fieldValue->externalData);
     }
 }

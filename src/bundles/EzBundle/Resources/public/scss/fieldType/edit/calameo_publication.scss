@@ -1,34 +1,73 @@
-.ez-field-edit--calameo_publication {
-    &.ez-field-edit--with-preview {
-        .ez-field-edit-preview {
-            width: 500px;
-            height: 80px;
-            line-height: 80px;
+$ibexa-color-danger: #db0032;
+$ibexa-color-danger-100: #fbe5ea;
+
+$base-font-size: 16px;
+
+@function div($number1, $number2) {
+    @return $number1 / $number2;
+}
+
+@function calculateRem($size) {
+    $remSize: div($size, $base-font-size);
+
+    @return $remSize + 0rem; // + 0rem converts value to proper `rem`
+}
+
+
+@mixin area-invalid {
+    color: $ibexa-color-danger;
+    border-color: $ibexa-color-danger;
+    background-color: $ibexa-color-danger-100;
+
+    .ibexa-btn {
+        background-color: $ibexa-color-danger-100;
+    }
+}
+
+.ibexa-field-edit--calameo_publication {
+    &.is-invalid {
+        .ibexa-data-source {
+            @include area-invalid();
+        }
+    }
+
+    &.ibexa-field-edit--with-preview {
+        .ibexa-field-edit-preview {
+            &__file-icon {
+                flex: 0 0 calculateRem(32px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
 
             &__visual {
-                display: flex;
+                grid-template-rows: auto;
             }
 
-            &__actions {
-                flex: 0 0 100px;
-                display: flex;
-                align-items: center;
-                flex-direction: row;
-                justify-content: space-between;
+            &__media-wrapper {
+                justify-content: start;
+                flex-direction: column;
+                align-items: flex-start;
+                padding: calculateRem(24px);
             }
 
-            &__action--preview {
-                margin-top: 0;
+            &__file-name-wrapper,
+            &__file-size-wrapper {
+                display: inline-block;
+                font-size: calculateRem(16px);
+                margin-right: calculateRem(40px);
+
+                .ibexa-label {
+                    margin-bottom: 0;
+                }
             }
 
-            &__file-name {
-                flex: 1 1 auto;
-                font-size: .75rem;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                overflow: hidden;
-                display: flex;
-                align-items: center;
+            &__file-name-wrapper {
+                max-width: calculateRem(500px);
+            }
+
+            &__file-size-wrapper {
+                max-width: calculateRem(150px);
             }
         }
     }

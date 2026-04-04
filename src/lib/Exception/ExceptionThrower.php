@@ -13,7 +13,7 @@ use AlmaviaCX\Calameo\Exception\Response;
 
 class ExceptionThrower
 {
-    private $exceptionsByCode = [
+    private array $exceptionsByCode = [
         99   => Response\TooManyRequestsException::class,
         101  => Response\InvalidSignatureException::class,
         102  => Response\InvalidEndpointException::class,
