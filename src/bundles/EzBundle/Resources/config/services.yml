@@ -18,9 +18,9 @@ services:
     #
     # namespace AlmaviaCX\Calameo\Ez\Form\Type\FieldType;
     resource: '../../../../lib/*'
-    exclude:
-      - '../../../../lib/**/Value/'
-      - '../../../../lib/**/Exception/'
+#    exclude:
+#      - '../../../../lib/**/Value/'
+#      - '../../../../lib/**/Exception/'
 
   AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\FormMapper:
     tags:
