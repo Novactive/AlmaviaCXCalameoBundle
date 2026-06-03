@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication;
 
 use AlmaviaCX\Calameo\API\Value\Publication;
-use Closure;
 use Ibexa\Core\FieldType\Value as BaseValue;
 
 class Value extends BaseValue

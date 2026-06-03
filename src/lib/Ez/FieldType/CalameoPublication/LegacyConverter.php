@@ -29,13 +29,13 @@ class LegacyConverter implements Converter
     {
     }
 
-    public function toStorageFieldDefinition(FieldDefinition $fieldDef, StorageFieldDefinition $storageDef)
+    public function toStorageFieldDefinition(FieldDefinition $fieldDef, StorageFieldDefinition $storageDef): void
     {
         $fieldSettings = $fieldDef->fieldTypeConstraints->fieldSettings;
         $storageDef->dataText1 = implode('|', $fieldSettings['availableFolderIds'] ?? []);
     }
 
-    public function toFieldDefinition(StorageFieldDefinition $storageDef, FieldDefinition $fieldDef)
+    public function toFieldDefinition(StorageFieldDefinition $storageDef, FieldDefinition $fieldDef): void
     {
         $fieldDef->fieldTypeConstraints->fieldSettings = [
             'availableFolderIds' => explode('|', $storageDef->dataText1 ?? "")

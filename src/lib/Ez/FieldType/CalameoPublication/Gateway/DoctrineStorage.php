@@ -43,7 +43,7 @@ class DoctrineStorage extends StorageGateway
      * @return bool
      * @throws Exception
      */
-    public function storePublicationReference(VersionInfo $versionInfo, Field $field)
+    public function storePublicationReference(VersionInfo $versionInfo, Field $field): bool
     {
         $referencedData = $this->getPublicationReferenceData($field->id, $versionInfo->versionNo);
 
@@ -67,7 +67,7 @@ class DoctrineStorage extends StorageGateway
      * @param VersionInfo $versionInfo
      * @param Field $field
      */
-    protected function setInsertColumns(QueryBuilder $queryBuilder, VersionInfo $versionInfo, Field $field)
+    protected function setInsertColumns(QueryBuilder $queryBuilder, VersionInfo $versionInfo, Field $field): void
     {
         $queryBuilder
             ->setValue('contentobject_attribute_id', ':fieldId')
@@ -86,7 +86,7 @@ class DoctrineStorage extends StorageGateway
      * @param VersionInfo $versionInfo
      * @param Field $field
      */
-    protected function setUpdateColumns(QueryBuilder $queryBuilder, VersionInfo $versionInfo, Field $field)
+    protected function setUpdateColumns(QueryBuilder $queryBuilder, VersionInfo $versionInfo, Field $field): void
     {
         $queryBuilder
             ->set('contentobject_attribute_id', ':fieldId')
@@ -105,7 +105,7 @@ class DoctrineStorage extends StorageGateway
      * @param Field $field
      * @throws Exception
      */
-    protected function updateFieldData(VersionInfo $versionInfo, Field $field)
+    protected function updateFieldData(VersionInfo $versionInfo, Field $field): void
     {
         $updateQuery = $this->connection->createQueryBuilder();
         $updateQuery->update(
@@ -138,7 +138,7 @@ class DoctrineStorage extends StorageGateway
      * @param Field $field
      * @throws Exception
      */
-    protected function storeNewFieldData(VersionInfo $versionInfo, Field $field)
+    protected function storeNewFieldData(VersionInfo $versionInfo, Field $field): void
     {
         $insertQuery = $this->connection->createQueryBuilder();
         $insertQuery->insert(
@@ -158,7 +158,7 @@ class DoctrineStorage extends StorageGateway
      *
      * @return mixed
      */
-    protected function castToPropertyValue($value, string $columnName)
+    protected function castToPropertyValue(mixed $value, string $columnName): mixed
     {
         $propertyMap = $this->getPropertyMapping();
         $castFunction = $propertyMap[$columnName]['cast'];
@@ -177,7 +177,7 @@ class DoctrineStorage extends StorageGateway
      * @param int $fieldId
      * @param int $versionNo
      */
-    protected function setFetchColumns(QueryBuilder $queryBuilder, $fieldId, $versionNo)
+    protected function setFetchColumns(QueryBuilder $queryBuilder, $fieldId, $versionNo): void
     {
         $queryBuilder->select(
             $this->connection->quoteIdentifier('publication_id'),
@@ -293,7 +293,7 @@ class DoctrineStorage extends StorageGateway
      * @param int $versionNo
      * @throws Exception
      */
-    public function removePublicationReferences(array $fieldIds, int $versionNo)
+    public function removePublicationReferences(array $fieldIds, int $versionNo): void
     {
         if (empty($fieldIds)) {
             return;

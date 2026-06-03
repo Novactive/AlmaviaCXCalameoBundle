@@ -15,11 +15,11 @@ namespace AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication;
 use AlmaviaCX\Calameo\API\Repository\AccountRepository;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
 use AlmaviaCX\Calameo\Ez\Form\Type\FieldType\CalameoPublicationFieldType;
-use EzSystems\RepositoryForms\Data\Content\FieldData;
-use EzSystems\RepositoryForms\FieldType\FieldDefinitionFormMapperInterface;
-use EzSystems\RepositoryForms\FieldType\FieldValueFormMapperInterface;
+use Ibexa\AdminUi\FieldType\FieldDefinitionFormMapperInterface;
 use Ibexa\AdminUi\Form\Data\FieldDefinitionData;
 use Ibexa\Contracts\AdminUi\Notification\NotificationHandlerInterface;
+use Ibexa\Contracts\ContentForms\Data\Content\FieldData;
+use Ibexa\Contracts\ContentForms\FieldType\FieldValueFormMapperInterface;
 use Ibexa\Contracts\Core\Repository\FieldTypeService;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
@@ -27,23 +27,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FormMapper implements FieldValueFormMapperInterface, FieldDefinitionFormMapperInterface
 {
-    protected FieldTypeService $fieldTypeService;
-    protected AccountRepository $accountRepository;
-    protected NotificationHandlerInterface $notificationHandler;
-
-    /**
-     * @param FieldTypeService             $fieldTypeService
-     * @param AccountRepository            $accountRepository
-     * @param NotificationHandlerInterface $notificationHandler
-     */
     public function __construct(
-        FieldTypeService $fieldTypeService,
-        AccountRepository $accountRepository,
-        NotificationHandlerInterface $notificationHandler
+        protected readonly FieldTypeService $fieldTypeService,
+        protected readonly AccountRepository $accountRepository,
+        protected readonly NotificationHandlerInterface $notificationHandler
     ) {
-        $this->fieldTypeService = $fieldTypeService;
-        $this->accountRepository = $accountRepository;
-        $this->notificationHandler = $notificationHandler;
     }
 
     // f
@@ -82,9 +70,9 @@ class FormMapper implements FieldValueFormMapperInterface, FieldDefinitionFormMa
             );
     }
 
-    public function mapFieldValueForm(FormInterface $fieldForm, FieldData $data)
+    public function mapFieldValueForm(FormInterface $fieldForm, FieldData $data): void
     {
-        $fieldDefinition = $data->fieldDefinition;
+        $fieldDefinition = $data->getFieldDefinition();
         $formConfig = $fieldForm->getConfig();
         $fieldType = $this->fieldTypeService->getFieldType($fieldDefinition->fieldTypeIdentifier);
 
@@ -111,7 +99,7 @@ class FormMapper implements FieldValueFormMapperInterface, FieldDefinitionFormMa
             );
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults(

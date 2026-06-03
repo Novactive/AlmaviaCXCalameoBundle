@@ -130,7 +130,7 @@ class CalameoPublicationFieldType extends AbstractType
         return BinaryBaseFieldType::class;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

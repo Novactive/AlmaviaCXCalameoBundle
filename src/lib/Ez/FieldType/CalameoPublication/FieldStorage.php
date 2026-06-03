@@ -27,29 +27,14 @@ use Ibexa\Contracts\Core\Persistence\Content\VersionInfo;
 use Psr\Log\LoggerInterface;
 use SplFileInfo;
 
-class FieldStorage implements FieldStorageInterface
+readonly class FieldStorage implements FieldStorageInterface
 {
-    public PublicationRepository $publicationRepository;
-    public PublishingService $publishingService;
-    public DoctrineStorage $gateway;
-    public LoggerInterface $logger;
-
-    /**
-     * @param PublicationRepository $publicationRepository
-     * @param PublishingService     $publishingService
-     * @param DoctrineStorage       $gateway
-     * @param LoggerInterface       $logger
-     */
     public function __construct(
-        PublicationRepository $publicationRepository,
-        PublishingService $publishingService,
-        DoctrineStorage $gateway,
-        LoggerInterface $logger
+        protected PublicationRepository $publicationRepository,
+        protected PublishingService     $publishingService,
+        protected DoctrineStorage       $gateway,
+        protected LoggerInterface       $logger
     ) {
-        $this->publicationRepository = $publicationRepository;
-        $this->publishingService = $publishingService;
-        $this->gateway = $gateway;
-        $this->logger = $logger;
     }
 
     /**
@@ -106,7 +91,6 @@ class FieldStorage implements FieldStorageInterface
     /**
      * @param VersionInfo $versionInfo
      * @param Field $field
-     * @param array $context
      * @throws Exception
      */
     public function getFieldData(VersionInfo $versionInfo, Field $field,): void

@@ -31,7 +31,7 @@ class ValueTransformer implements DataTransformerInterface
      * @param Value|null $value
      * @return array
      */
-    public function transform($value)
+    public function transform($value): array
     {
         if (null === $value) {
             $value = $this->fieldType->getEmptyValue();
@@ -49,7 +49,7 @@ class ValueTransformer implements DataTransformerInterface
      * @param array|null $value
      * @return Value
      */
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (!is_array($value)) {
             throw new TransformationFailedException(sprintf('Expected a array got %s', gettype($value)));
