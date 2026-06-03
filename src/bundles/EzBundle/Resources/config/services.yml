@@ -24,10 +24,8 @@ services:
 
   AlmaviaCX\Calameo\API\HttpClientFactory: ~
 
-  almaviacx.calameo.httpclient.siteaccessaware:
+  AlmaviaCX\Calameo\API\HttpClient:
     lazy: true
-    class: AlmaviaCX\Calameo\API\HttpClient
-    decorates: AlmaviaCX\Calameo\API\HttpClient
     factory: ['@AlmaviaCX\Calameo\API\HttpClientFactory', 'create']
 
   AlmaviaCX\Calameo\Ez\Twig\CalameoTwigExtension:
