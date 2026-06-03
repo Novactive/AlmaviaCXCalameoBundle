@@ -11,6 +11,17 @@ services:
     # if you need to do this, you can override this setting on individual services
     public: false
 
+  AlmaviaCX\Calameo\:
+    # * AlmaviaCXCalameoBundle/src/
+    #  ** bundles/EzBundle/Resources/config/services.yml
+    #  ** lib
+    #
+    # namespace AlmaviaCX\Calameo\Ez\Form\Type\FieldType;
+    resource: '../../../../lib/*'
+    exclude:
+      - '../../../../lib/**/Value/'
+      - '../../../../lib/**/Exception/'
+
   AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\FormMapper:
     tags:
       - { name: ez.fieldFormMapper.definition, fieldType: calameo_publication }

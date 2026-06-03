@@ -17,6 +17,7 @@ use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
 use AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Value;
 use Ibexa\ContentForms\Form\Type\FieldType\BinaryBaseFieldType;
 use Ibexa\Contracts\AdminUi\Notification\NotificationHandlerInterface;
+use JMS\TranslationBundle\Annotation\Desc;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -29,13 +30,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CalameoPublicationFieldType extends AbstractType
 {
-    protected AccountRepository $accountRepository;
-    protected NotificationHandlerInterface $notificationHandler;
-
-    public function __construct(AccountRepository $accountRepository, NotificationHandlerInterface $notificationHandler)
+    public function __construct(
+        protected readonly AccountRepository $accountRepository,
+        protected readonly NotificationHandlerInterface $notificationHandler
+    )
     {
-        $this->accountRepository = $accountRepository;
-        $this->notificationHandler = $notificationHandler;
     }
 
     public function getName(): string
@@ -48,7 +47,7 @@ class CalameoPublicationFieldType extends AbstractType
         return 'ezplatform_fieldtype_calameo_publication';
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $folderChoices = [];
         $filteredFolderChoices = [];
