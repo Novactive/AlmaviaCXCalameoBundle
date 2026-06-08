@@ -74,10 +74,10 @@ class DoctrineStorage extends StorageGateway
             ->setValue('publication_id', ':publicationId')
             ->setValue('folder_id', ':folderId')
             ->setValue('version', ':versionNo')
-            ->setParameter(':fieldId', $field->id, PDO::PARAM_INT)
-            ->setParameter(':publicationId', $field->value->externalData['publicationId'], PDO::PARAM_STR)
-            ->setParameter(':folderId', $field->value->externalData['folderId'], PDO::PARAM_INT)
-            ->setParameter(':versionNo', $versionInfo->versionNo, PDO::PARAM_INT)
+            ->setParameter('fieldId', $field->id, PDO::PARAM_INT)
+            ->setParameter('publicationId', $field->value->externalData['publicationId'], PDO::PARAM_STR)
+            ->setParameter('folderId', $field->value->externalData['folderId'], PDO::PARAM_INT)
+            ->setParameter('versionNo', $versionInfo->versionNo, PDO::PARAM_INT)
         ;
     }
 
@@ -93,10 +93,10 @@ class DoctrineStorage extends StorageGateway
             ->set('publication_id', ':publicationId')
             ->set('folder_id', ':folderId')
             ->set('version', ':versionNo')
-            ->setParameter(':fieldId', $field->id, PDO::PARAM_INT)
-            ->setParameter(':publicationId', $field->value->externalData['publicationId'], PDO::PARAM_STR)
-            ->setParameter(':folderId', $field->value->externalData['folderId'], PDO::PARAM_INT)
-            ->setParameter(':versionNo', $versionInfo->versionNo, PDO::PARAM_INT)
+            ->setParameter('fieldId', $field->id, PDO::PARAM_INT)
+            ->setParameter('publicationId', $field->value->externalData['publicationId'], PDO::PARAM_STR)
+            ->setParameter('folderId', $field->value->externalData['folderId'], PDO::PARAM_INT)
+            ->setParameter('versionNo', $versionInfo->versionNo, PDO::PARAM_INT)
         ;
     }
 
@@ -126,8 +126,8 @@ class DoctrineStorage extends StorageGateway
                     )
                 )
             )
-            ->setParameter(':fieldId', $field->id, PDO::PARAM_INT)
-            ->setParameter(':versionNo', $versionInfo->versionNo, PDO::PARAM_INT)
+            ->setParameter('fieldId', $field->id, PDO::PARAM_INT)
+            ->setParameter('versionNo', $versionInfo->versionNo, PDO::PARAM_INT)
         ;
 
         $updateQuery->execute();
@@ -214,8 +214,8 @@ class DoctrineStorage extends StorageGateway
                     )
                 )
             )
-            ->setParameter(':fieldId', $fieldId, PDO::PARAM_INT)
-            ->setParameter(':versionNo', $versionNo, PDO::PARAM_INT)
+            ->setParameter('fieldId', $fieldId, PDO::PARAM_INT)
+            ->setParameter('versionNo', $versionNo, PDO::PARAM_INT)
         ;
 
         $statement = $selectQuery->execute();
@@ -261,7 +261,7 @@ class DoctrineStorage extends StorageGateway
                     ':fieldIds'
                 )
             )
-            ->setParameter(':fieldIds', $fieldIds, Connection::PARAM_INT_ARRAY);
+            ->setParameter('fieldIds', $fieldIds, Connection::PARAM_INT_ARRAY);
         $statement = $selectQuery->execute();
 
         $publicationIds = [];
@@ -314,8 +314,8 @@ class DoctrineStorage extends StorageGateway
                     )
                 )
             )
-            ->setParameter(':fieldIds', $fieldIds, Connection::PARAM_INT_ARRAY)
-            ->setParameter(':versionNo', $versionNo, PDO::PARAM_INT)
+            ->setParameter('fieldIds', $fieldIds, Connection::PARAM_INT_ARRAY)
+            ->setParameter('versionNo', $versionNo, PDO::PARAM_INT)
         ;
 
         $deleteQuery->execute();
