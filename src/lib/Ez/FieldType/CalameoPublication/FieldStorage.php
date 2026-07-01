@@ -26,14 +26,16 @@ use Ibexa\Contracts\Core\Persistence\Content\Field;
 use Ibexa\Contracts\Core\Persistence\Content\VersionInfo;
 use Psr\Log\LoggerInterface;
 use SplFileInfo;
+use Ibexa\Contracts\Core\SiteAccess\ConfigResolverInterface;
 
 readonly class FieldStorage implements FieldStorageInterface
 {
     public function __construct(
         protected PublicationRepository $publicationRepository,
-        protected PublishingService     $publishingService,
-        protected DoctrineStorage       $gateway,
-        protected LoggerInterface       $logger
+        protected PublishingService $publishingService,
+        protected DoctrineStorage $gateway,
+        protected LoggerInterface $logger,
+        protected ConfigResolverInterface $configResolver,
     ) {
     }
 
@@ -118,18 +120,38 @@ readonly class FieldStorage implements FieldStorageInterface
 
         $publicationIds = $this->gateway->getReferencedPublications($fieldIds);
         $versionPublicationId = $publicationIds[$versionInfo->versionNo] ?? null;
+
+        // On supprime toujours la référence locale.
+        // La suppression dans Ibexa ne doit pas être bloquée par une config API Calaméo absente.
         $this->gateway->removePublicationReferences($fieldIds, $versionInfo->versionNo);
 
         $versionWithPublication = array_keys($publicationIds, $versionPublicationId);
-        if (count($versionWithPublication) <= 1 && $versionPublicationId) {
-            try {
-                $this->publicationRepository->deletePublication($versionPublicationId);
-            } catch (UnknownBookIDException $exception) {
-                return ;
-            } catch (ApiResponseErrorException $exception) {
-                $this->logger->error($exception->getMessage());
-                return ;
-            }
+
+        if (count($versionWithPublication) > 1 || !$versionPublicationId) {
+            return;
+        }
+
+        if (!$this->isCalameoApiConfigured()) {
+            $this->logger->warning(sprintf(
+                '[Calameo] Suppression distante ignorée pour la publication "%s" : API key/secret non configurés.',
+                $versionPublicationId
+            ));
+
+            return;
+        }
+
+        try {
+            $this->publicationRepository->deletePublication($versionPublicationId);
+        } catch (UnknownBookIDException) {
+            return;
+        } catch (ApiResponseErrorException|GuzzleException $exception) {
+            $this->logger->error(sprintf(
+                '[Calameo] Impossible de supprimer la publication distante "%s" : %s',
+                $versionPublicationId,
+                $exception->getMessage()
+            ));
+
+            return;
         }
     }
 
@@ -151,12 +173,53 @@ readonly class FieldStorage implements FieldStorageInterface
     {
     }
 
-    public function copyLegacyField(VersionInfo $versionInfo, Field $field, Field $originalField, array $context): bool
-    {
-        if ($originalField->value->externalData === null) {
+    public function copyLegacyField(
+        VersionInfo $versionInfo,
+        Field $field,
+        Field $originalField,
+        array $context = []
+    ): bool {
+        $externalData = $originalField->value->externalData ?? null;
+
+        if (!is_array($externalData)) {
             return false;
         }
 
-        return $this->gateway->storePublicationReference($versionInfo, $field);
+        if (empty($externalData['publicationId']) || empty($externalData['folderId'])) {
+            return false;
+        }
+
+        $field->value->externalData = [
+            'publicationId' => $externalData['publicationId'],
+            'folderId' => $externalData['folderId'],
+        ];
+
+        $this->gateway->storePublicationReference($versionInfo, $field);
+
+        return true;
+    }
+
+    private function isCalameoApiConfigured(): bool
+    {
+        return $this->getCalameoConfigString('api.key') !== ''
+            && $this->getCalameoConfigString('api.secret') !== '';
+    }
+
+    private function getCalameoConfigString(string $name): string
+    {
+        try {
+            $value = $this->configResolver->getParameter(
+                sprintf('calameo.%s', $name),
+                'almaviacx'
+            );
+        } catch (\Throwable) {
+            return '';
+        }
+
+        if (!is_scalar($value)) {
+            return '';
+        }
+
+        return trim((string) $value);
     }
 }
