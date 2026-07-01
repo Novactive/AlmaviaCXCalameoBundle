@@ -40,3 +40,11 @@ services:
     factory: ['@AlmaviaCX\Calameo\API\HttpClientFactory', 'create']
 
   AlmaviaCX\Calameo\Ez\Twig\CalameoTwigExtension:
+
+  AlmaviaCX\Bundle\Calameo\EzBundle\Controller\:
+    resource: '../../Controller/'
+    arguments:
+      $APIKey: "%almaviacx.calameo.api.key%"
+      $APISecret: "%almaviacx.calameo.api.secret%"
+      $config: "%almaviacx.calameo.http_client.config%"
+    tags: ['controller.service_arguments']

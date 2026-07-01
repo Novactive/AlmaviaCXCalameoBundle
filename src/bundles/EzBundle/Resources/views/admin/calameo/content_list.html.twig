@@ -1,0 +1,97 @@
+{# Resources/views/admin/calameo/content_list.html.twig #}
+
+<h1>Contenus avec champ Calaméo</h1>
+
+<nav>
+  <a href="{{ path('almaviacx_calameo_admin_index') }}">Configuration</a>
+  |
+  <a href="{{ path('almaviacx_calameo_admin_publication_list') }}">Publications</a>
+</nav>
+
+<p>
+  {{ pagination.total }} contenu{{ pagination.total > 1 ? 's' : '' }} trouvé{{ pagination.total > 1 ? 's' : '' }}.
+  Page {{ pagination.page }}{% if pagination.pages > 0 %} / {{ pagination.pages }}{% endif %}.
+</p>
+
+<table>
+  <thead>
+  <tr>
+    <th>Content ID</th>
+    <th>Nom</th>
+    <th>Type</th>
+    <th>Champ</th>
+    <th>Field ID</th>
+    <th>Version</th>
+    <th>Publication ID</th>
+    <th>Folder ID</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for item in items %}
+    <tr>
+      <td>
+        <a href="{{ item.content_view_url }}">
+          {{ item.content_id }}
+        </a>
+      </td>
+      <td>{{ item.content_name }}</td>
+      <td><code>{{ item.content_type_identifier }}</code></td>
+      <td><code>{{ item.field_identifier }}</code></td>
+      <td><code>{{ item.field_id }}</code></td>
+      <td>{{ item.version }}</td>
+      <td>
+        {% if item.publication_id %}
+        <ul>
+        <li>Read <a target="_blank" href="https://www.calameo.com/read/{{ item.publication_id }}">{{ item.publication_id }}</a></li>
+        <li>Détail <a target="_blank" href="https://www.calameo.com/books/{{ item.publication_id }}">{{ item.publication_id }}</a></li>
+        </ul>
+        {% endif %}
+      </td>
+      <td><a target="_blank" href="https://www.calameo.com/account/book#subscription-{{ item.folder_id }}">{{ item.folder_id }}</a></td>
+    </tr>
+  {% else %}
+    <tr>
+      <td colspan="8">Aucun contenu trouvé.</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% if pagination.pages > 1 %}
+  <nav aria-label="Pagination">
+    {% if pagination.has_previous %}
+      <a href="{{ path('almaviacx_calameo_admin_content_list', {
+        page: pagination.page - 1,
+        limit: pagination.limit
+      }) }}">
+        Précédent
+      </a>
+    {% else %}
+      <span>Précédent</span>
+    {% endif %}
+
+    {% for page in 1..pagination.pages %}
+      {% if page == pagination.page %}
+        <strong>{{ page }}</strong>
+      {% else %}
+        <a href="{{ path('almaviacx_calameo_admin_content_list', {
+          page: page,
+          limit: pagination.limit
+        }) }}">
+          {{ page }}
+        </a>
+      {% endif %}
+    {% endfor %}
+
+    {% if pagination.has_next %}
+      <a href="{{ path('almaviacx_calameo_admin_content_list', {
+        page: pagination.page + 1,
+        limit: pagination.limit
+      }) }}">
+        Suivant
+      </a>
+    {% else %}
+      <span>Suivant</span>
+    {% endif %}
+  </nav>
+{% endif %}

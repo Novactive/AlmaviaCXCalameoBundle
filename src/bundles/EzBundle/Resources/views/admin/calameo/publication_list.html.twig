@@ -1,0 +1,45 @@
+{# Resources/views/admin/calameo/publication_list.html.twig #}
+
+<h1>Table calameo_publication</h1>
+
+<nav>
+  <a href="{{ path('almaviacx_calameo_admin_index') }}">Configuration</a>
+  |
+  <a href="{{ path('almaviacx_calameo_admin_content_list') }}">Contenus</a>
+</nav>
+
+{% if not table_exists %}
+  <p>La table calameo_publication n’existe pas.</p>
+{% else %}
+  <table>
+    <thead>
+    <tr>
+      <th>Attribute ID</th>
+      <th>Version</th>
+      <th>Publication ID</th>
+      <th>Folder ID</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for item in items %}
+      <tr>
+        <td>{{ item.contentobject_attribute_id }}</td>
+        <td>{{ item.version }}</td>
+        <td>
+          {% if item.publication_id %}
+            <ul>
+              <li>Read <a target="_blank" href="https://www.calameo.com/read/{{ item.publication_id }}">{{ item.publication_id }}</a></li>
+              <li>Détail <a target="_blank" href="https://www.calameo.com/books/{{ item.publication_id }}">{{ item.publication_id }}</a></li>
+            </ul>
+          {% endif %}
+        </td>
+        <td><a target="_blank" href="https://www.calameo.com/account/book#subscription-{{ item.folder_id }}">{{ item.folder_id }}</a></td>
+      </tr>
+    {% else %}
+      <tr>
+        <td colspan="4">Aucune entrée trouvée.</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
