@@ -24,9 +24,9 @@ use GuzzleHttp\Exception\GuzzleException;
 use Ibexa\Contracts\Core\FieldType\FieldStorage as FieldStorageInterface;
 use Ibexa\Contracts\Core\Persistence\Content\Field;
 use Ibexa\Contracts\Core\Persistence\Content\VersionInfo;
+use Ibexa\Contracts\Core\SiteAccess\ConfigResolverInterface;
 use Psr\Log\LoggerInterface;
 use SplFileInfo;
-use Ibexa\Contracts\Core\SiteAccess\ConfigResolverInterface;
 
 readonly class FieldStorage implements FieldStorageInterface
 {
@@ -140,6 +140,15 @@ readonly class FieldStorage implements FieldStorageInterface
             return;
         }
 
+        if (!$this->isCalameoDeleteBookEnable()) {
+            $this->logger->warning(sprintf(
+                '[Calameo] Suppression distante ignorée pour la publication "%s" : delete_book_enable=false.',
+                $versionPublicationId
+            ));
+
+            return;
+        }
+
         try {
             $this->publicationRepository->deletePublication($versionPublicationId);
         } catch (UnknownBookIDException) {
@@ -203,6 +212,11 @@ readonly class FieldStorage implements FieldStorageInterface
     {
         return $this->getCalameoConfigString('api.key') !== ''
             && $this->getCalameoConfigString('api.secret') !== '';
+    }
+
+    private function isCalameoDeleteBookEnable(): bool
+    {
+        return $this->getCalameoConfigString('delete_book_enable') === '1';
     }
 
     private function getCalameoConfigString(string $name): string

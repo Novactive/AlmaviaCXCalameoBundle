@@ -1,13 +1,32 @@
 {# Resources/views/admin/calameo/publication_list.html.twig #}
+{% extends '@ibexadesign/ui/layout.html.twig' %}
 
-<h1>Table calameo_publication</h1>
+{% block title %}Table calameo_publication{% endblock %}
 
-<nav>
-  <a href="{{ path('almaviacx_calameo_admin_index') }}">Configuration</a>
-  |
-  <a href="{{ path('almaviacx_calameo_admin_content_list') }}">Contenus</a>
-</nav>
+{% block page_title %}
+  {% include '@ibexadesign/ui/page_title.html.twig' with {
+    title: 'Table calameo_publication',
+    icon_name: 'catalog'
+  } %}
+{% endblock %}
 
+{% block breadcrumbs %}
+  {% include '@ibexadesign/ui/breadcrumbs.html.twig' with {
+    items: [
+      {
+        value: 'Configuration CALAMEO',
+        url: path('almaviacx_calameo_admin_index')
+      },
+      {
+        value: 'Table calameo_publication',
+        url: path('almaviacx_calameo_admin_content_list')
+      },
+    ]
+  } %}
+{% endblock %}
+
+
+{% block content %}
 {% if not table_exists %}
   <p>La table calameo_publication n’existe pas.</p>
 {% else %}
@@ -28,8 +47,8 @@
         <td>
           {% if item.publication_id %}
             <ul>
-              <li>Read <a target="_blank" href="https://www.calameo.com/read/{{ item.publication_id }}">{{ item.publication_id }}</a></li>
-              <li>Détail <a target="_blank" href="https://www.calameo.com/books/{{ item.publication_id }}">{{ item.publication_id }}</a></li>
+              <li><a target="_blank" title="READ" href="https://www.calameo.com/read/{{ item.publication_id }}">{{ item.publication_id }}</a></li>
+              <li><a target="_blank" title="Détail"  href="https://www.calameo.com/books/{{ item.publication_id }}">{{ item.publication_id }}</a></li>
             </ul>
           {% endif %}
         </td>
@@ -43,3 +62,5 @@
     </tbody>
   </table>
 {% endif %}
+
+{% endblock %}

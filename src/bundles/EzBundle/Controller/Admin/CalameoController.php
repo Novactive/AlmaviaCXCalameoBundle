@@ -6,32 +6,31 @@ namespace AlmaviaCX\Bundle\Calameo\EzBundle\Controller\Admin;
 
 use Doctrine\DBAL\Connection;
 use Ibexa\ActivityLog\REST\Input\Parser\SortClause\SortClause;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Ibexa\Contracts\Core\Repository\ContentTypeService;
 use Ibexa\Contracts\Core\Repository\SearchService;
 use Ibexa\Contracts\Core\Repository\Values\Content\Query;
 use Ibexa\Contracts\Core\Repository\Values\Content\Query\Criterion;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/admin/calameo', name: 'almaviacx_calameo_admin_')]
 #[IsGranted('IS_AUTHENTICATED_FULLY')]
 final class CalameoController extends AbstractController
 {
-    private const FIELD_TYPE_IDENTIFIER = 'calameo_publication';
-    private const TABLE_NAME = 'calameo_publication';
+    private const string FIELD_TYPE_IDENTIFIER = 'calameo_publication';
+    private const string TABLE_NAME = 'calameo_publication';
 
     public function __construct(
-        private readonly Connection $connection,
-        private readonly ParameterBagInterface $parameterBag,
+        private readonly Connection         $connection,
         private readonly ContentTypeService $contentTypeService,
-        private readonly SearchService $searchService,
-        private string $APIKey,
-        private string $APISecret,
-        private array $config,
+        private readonly SearchService      $searchService,
+        private readonly string             $APIKey,
+        private readonly string             $APISecret,
+        private readonly array              $config,
+        private readonly bool               $deleteBookEnable,
     ) {
     }
 
@@ -48,6 +47,7 @@ final class CalameoController extends AbstractController
                 'almaviacx.calameo.api.key' => $this->APIKey,
                 'almaviacx.calameo.api.secret' => str_repeat('*', strlen($this->APISecret)),
                 'almaviacx.calameo.http_client.config' => $this->config,
+                'almaviacx.calameo.delete_book_enable' => $this->deleteBookEnable,
             ],
             'stats' => [
                 'field_definitions' => $this->countCalameoFieldDefinitions(),
@@ -88,7 +88,7 @@ final class CalameoController extends AbstractController
             'limit' => $limit,
             'offset' => $offset,
         ]);
-        $query->sortClauses = [new Query\SortClause\ContentId()];
+        $query->sortClauses = [new Query\SortClause\ContentId(Query::SORT_DESC)];
 
         $searchResult = $this->searchService->findContent($query);
 

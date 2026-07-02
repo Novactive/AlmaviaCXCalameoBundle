@@ -47,4 +47,5 @@ services:
       $APIKey: "%almaviacx.calameo.api.key%"
       $APISecret: "%almaviacx.calameo.api.secret%"
       $config: "%almaviacx.calameo.http_client.config%"
+      $deleteBookEnable: "%almaviacx.calameo.delete_book_enable%"
     tags: ['controller.service_arguments']

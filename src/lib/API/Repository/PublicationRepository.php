@@ -16,14 +16,16 @@ use AlmaviaCX\Calameo\API\Gateway\PublicationGateway;
 use AlmaviaCX\Calameo\API\Value\Publication;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Log\LoggerInterface;
 
 class PublicationRepository
 {
-    protected PublicationGateway $gateway;
-
-    public function __construct(PublicationGateway $gateway)
+    public function __construct(
+        protected PublicationGateway $gateway,
+        protected bool $deleteBookEnable = false,
+        private readonly ?LoggerInterface $logger = null,
+    )
     {
-        $this->gateway = $gateway;
     }
 
     /**
@@ -39,13 +41,23 @@ class PublicationRepository
 
     /**
      * @param string $publicationId
-     * @return bool
+     * @return bool Return false if deleteBookEnable is false
      * @throws ApiResponseErrorException
      * @throws GuzzleException
      */
     public function deletePublication(string $publicationId): bool
     {
+        if (!$this->deleteBookEnable) {
+            $this->logger?->info(sprintf(
+                '[Calameo] Suppression distante ignorée pour la publication "%s" : almaviacx.calameo.delete_book_enable=false.',
+                $publicationId
+            ));
+
+            return false;
+        }
+
         $this->gateway->deleteBook($publicationId);
+
         return true;
     }
 }

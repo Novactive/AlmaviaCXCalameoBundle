@@ -1,13 +1,32 @@
 {# Resources/views/admin/calameo/content_list.html.twig #}
+{% extends '@ibexadesign/ui/layout.html.twig' %}
 
-<h1>Contenus avec champ Calaméo</h1>
+{% block title %}Contenus avec champ Calaméo{% endblock %}
 
-<nav>
-  <a href="{{ path('almaviacx_calameo_admin_index') }}">Configuration</a>
-  |
-  <a href="{{ path('almaviacx_calameo_admin_publication_list') }}">Publications</a>
-</nav>
+{% block page_title %}
+  {% include '@ibexadesign/ui/page_title.html.twig' with {
+    title: 'Contenus avec champ Calaméo',
+    icon_name: 'catalog'
+  } %}
+{% endblock %}
 
+{% block breadcrumbs %}
+  {% include '@ibexadesign/ui/breadcrumbs.html.twig' with {
+    items: [
+      {
+        value: 'Configuration CALAMEO',
+        url: path('almaviacx_calameo_admin_index')
+      },
+      {
+        value: 'Contenus avec champ Calaméo',
+        url: path('almaviacx_calameo_admin_publication_list')
+      },
+    ]
+  } %}
+{% endblock %}
+
+
+{% block content %}
 <p>
   {{ pagination.total }} contenu{{ pagination.total > 1 ? 's' : '' }} trouvé{{ pagination.total > 1 ? 's' : '' }}.
   Page {{ pagination.page }}{% if pagination.pages > 0 %} / {{ pagination.pages }}{% endif %}.
@@ -42,8 +61,8 @@
       <td>
         {% if item.publication_id %}
         <ul>
-        <li>Read <a target="_blank" href="https://www.calameo.com/read/{{ item.publication_id }}">{{ item.publication_id }}</a></li>
-        <li>Détail <a target="_blank" href="https://www.calameo.com/books/{{ item.publication_id }}">{{ item.publication_id }}</a></li>
+        <li><a target="_blank" title="READ" href="https://www.calameo.com/read/{{ item.publication_id }}">{{ item.publication_id }}</a></li>
+        <li><a target="_blank" title="Détail"  href="https://www.calameo.com/books/{{ item.publication_id }}">{{ item.publication_id }}</a></li>
         </ul>
         {% endif %}
       </td>
@@ -95,3 +114,5 @@
     {% endif %}
   </nav>
 {% endif %}
+
+{% endblock %}

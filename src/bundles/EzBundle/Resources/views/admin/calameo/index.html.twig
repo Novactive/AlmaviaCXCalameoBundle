@@ -1,7 +1,29 @@
 {# Resources/views/admin/calameo/index.html.twig #}
 
-<h1>Calaméo</h1>
+{% extends '@ibexadesign/ui/layout.html.twig' %}
 
+{% block title %}Calaméo{% endblock %}
+
+{% block page_title %}
+  {% include '@ibexadesign/ui/page_title.html.twig' with {
+    title: 'Calaméo',
+    icon_name: 'catalog'
+  } %}
+{% endblock %}
+
+{% block breadcrumbs %}
+  {% include '@ibexadesign/ui/breadcrumbs.html.twig' with {
+    items: [
+      {
+        value: 'Calaméo',
+        url: path('almaviacx_calameo_admin_index')
+      },
+    ]
+  } %}
+{% endblock %}
+
+
+{% block content %}
 <nav>
   <a href="{{ path('almaviacx_calameo_admin_index') }}">Configuration</a>
   |
@@ -51,3 +73,5 @@
   <li>Contenus avec champ Calaméo : {{ stats.contents }}</li>
   <li>Entrées dans calameo_publication : {{ stats.publications ?? 'table absente' }}</li>
 </ul>
+
+{% endblock %}
