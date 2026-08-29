@@ -19,13 +19,13 @@ use AlmaviaCX\Calameo\API\Value\Response\ResponseContent;
 class Folder extends ResponseContent
 {
     /** @var string Title of the publication */
-    public const SORT_NAME = 'Name';
+    public const string SORT_NAME = 'Name';
 
     /** @var string Date of creation */
-    public const SORT_CREATION = 'Creation';
+    public const string SORT_CREATION = 'Creation';
 
     /** @var string Date the folder was last modified */
-    public const SORT_MODIFICATION = 'Modification';
+    public const string SORT_MODIFICATION = 'Modification';
 
     /**
      * Unique identifying key for the folder
@@ -33,7 +33,7 @@ class Folder extends ResponseContent
      * @Serializer\Type("int")
      * @Serializer\SerializedName("ID")
      */
-    public $id;
+    public int $id;
 
     /**
      * Unique identifying key for the account of the folder
@@ -41,7 +41,7 @@ class Folder extends ResponseContent
      * @Serializer\Type("int")
      * @Serializer\SerializedName("AccountID")
      */
-    public $accountId;
+    public int $accountId;
 
     /**
      * Title of the folder
@@ -49,7 +49,7 @@ class Folder extends ResponseContent
      * @Serializer\Type("string")
      * @Serializer\SerializedName("Name")
      */
-    public $name;
+    public string $name;
 
     /**
      * Description of the folder
@@ -57,7 +57,7 @@ class Folder extends ResponseContent
      * @Serializer\Type("string")
      * @Serializer\SerializedName("Description")
      */
-    public $description;
+    public string $description;
 
     /**
      * Available publications inside the folder
@@ -65,7 +65,7 @@ class Folder extends ResponseContent
      * @Serializer\Type("int")
      * @Serializer\SerializedName("Books")
      */
-    public $books;
+    public int $books;
 
     /**
      * Available subscribers inside the folder (only returned for your account's folder)
@@ -73,7 +73,7 @@ class Folder extends ResponseContent
      * @Serializer\Type("int")
      * @Serializer\SerializedName("Subscribers")
      */
-    public $subscribers;
+    public int $subscribers;
 
     /**
      * Date of the folder's creation
@@ -81,7 +81,7 @@ class Folder extends ResponseContent
      * @Serializer\Type("DateTime<'Y-m-d H:i:s'>")
      * @Serializer\SerializedName("Creation")
      */
-    public $creation;
+    public DateTime $creation;
 
     /**
      * Date of the folder's last modification
@@ -89,7 +89,7 @@ class Folder extends ResponseContent
      * @Serializer\Type("DateTime<'Y-m-d H:i:s'>")
      * @Serializer\SerializedName("Modification")
      */
-    public $modification;
+    public DateTime $modification;
 
     /**
      * Absolute URL for the folder's overview
@@ -97,5 +97,5 @@ class Folder extends ResponseContent
      * @Serializer\Type("string")
      * @Serializer\SerializedName("PublicUrl")
      */
-    public $publicUrl;
+    public string $publicUrl;
 }

@@ -1,13 +1,13 @@
 {
   "name": "almaviacx/calameobundle",
-  "description": "AlmaviaCX Calaméo Bundle provide a client for the Rest API and a new field type for eZPlatform.",
+  "description": "AlmaviaCX Calaméo Bundle provide a client for the Rest API and a new field type for Ibexa.",
   "keywords": [
     "calameo",
-    "ezplatform",
+    "ibexa",
     "almaviacx"
   ],
   "homepage": "https://github.com/Novactive/AlmaviaCXCalameoBundle",
-  "type": "ezplatform-bundle",
+  "type": "ibexa-bundle",
   "authors": [
     {
       "name": "AlmaviaCX",
@@ -19,15 +19,15 @@
     "MIT"
   ],
   "require": {
-    "php": "^7.2",
+    "php": ">=8.3",
     "ext-json": "*",
-    "doctrine/cache": "^1.10",
-    "ezsystems/ezpublish-kernel": "^7.5",
-    "ezsystems/repository-forms": "^2.5",
-    "guzzlehttp/guzzle": "^6.0",
-    "jms/serializer": "^1.0",
-    "jms/serializer-bundle": "^2.0",
-    "symfony/symfony": "^3.4"
+    "ext-pdo": "*",
+    "guzzlehttp/guzzle": "^7.10",
+    "guzzlehttp/promises": "^2.3",
+    "ibexa/oss": "^5",
+    "jms/serializer-bundle": "^5.5",
+    "nyholm/psr7": "^1.8",
+    "symfony/var-exporter": "^6.0|^7.0|^8.0"
   },
   "autoload": {
     "psr-4": {
@@ -46,6 +46,11 @@
     "phpunit/phpunit": "^9.5"
   },
   "config": {
-    "sort-packages": true
+    "sort-packages": true,
+    "allow-plugins": {
+      "php-http/discovery": true,
+      "symfony/flex": true,
+      "ibexa/post-install": true
+    }
   }
 }

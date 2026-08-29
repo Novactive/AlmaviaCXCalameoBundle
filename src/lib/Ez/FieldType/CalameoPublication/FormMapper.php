@@ -15,47 +15,27 @@ namespace AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication;
 use AlmaviaCX\Calameo\API\Repository\AccountRepository;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
 use AlmaviaCX\Calameo\Ez\Form\Type\FieldType\CalameoPublicationFieldType;
-use eZ\Publish\API\Repository\FieldTypeService;
-use eZ\Publish\Core\FieldType\BinaryFile\Value;
-use EzSystems\EzPlatformAdminUi\Notification\NotificationHandlerInterface;
-use EzSystems\RepositoryForms\Data\Content\FieldData;
-use EzSystems\RepositoryForms\Data\FieldDefinitionData;
-use EzSystems\RepositoryForms\FieldType\DataTransformer\BinaryFileValueTransformer;
-use EzSystems\RepositoryForms\FieldType\FieldDefinitionFormMapperInterface;
-use EzSystems\RepositoryForms\FieldType\FieldValueFormMapperInterface;
-use EzSystems\RepositoryForms\Form\Type\FieldType\BinaryFileFieldType;
-use GuzzleHttp\Exception\GuzzleException;
+use Ibexa\AdminUi\FieldType\FieldDefinitionFormMapperInterface;
+use Ibexa\AdminUi\Form\Data\FieldDefinitionData;
+use Ibexa\Contracts\AdminUi\Notification\NotificationHandlerInterface;
+use Ibexa\Contracts\ContentForms\Data\Content\FieldData;
+use Ibexa\Contracts\ContentForms\FieldType\FieldValueFormMapperInterface;
+use Ibexa\Contracts\Core\Repository\FieldTypeService;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FormMapper implements FieldValueFormMapperInterface, FieldDefinitionFormMapperInterface
 {
-    /** @var FieldTypeService */
-    protected $fieldTypeService;
-
-    /** @var AccountRepository */
-    protected $accountRepository;
-
-    /** @var NotificationHandlerInterface */
-    protected $notificationHandler;
-
-    /**
-     * @param FieldTypeService             $fieldTypeService
-     * @param AccountRepository            $accountRepository
-     * @param NotificationHandlerInterface $notificationHandler
-     */
     public function __construct(
-        FieldTypeService $fieldTypeService,
-        AccountRepository $accountRepository,
-        NotificationHandlerInterface $notificationHandler
+        protected readonly FieldTypeService $fieldTypeService,
+        protected readonly AccountRepository $accountRepository,
+        protected readonly NotificationHandlerInterface $notificationHandler
     ) {
-        $this->fieldTypeService = $fieldTypeService;
-        $this->accountRepository = $accountRepository;
-        $this->notificationHandler = $notificationHandler;
     }
 
-    public function mapFieldDefinitionForm(FormInterface $fieldDefinitionForm, FieldDefinitionData $data)
+    // f
+    public function mapFieldDefinitionForm(FormInterface $fieldDefinitionForm, FieldDefinitionData $data): void
     {
         $folderChoices = [];
         $offset = 0;
@@ -90,9 +70,9 @@ class FormMapper implements FieldValueFormMapperInterface, FieldDefinitionFormMa
             );
     }
 
-    public function mapFieldValueForm(FormInterface $fieldForm, FieldData $data)
+    public function mapFieldValueForm(FormInterface $fieldForm, FieldData $data): void
     {
-        $fieldDefinition = $data->fieldDefinition;
+        $fieldDefinition = $data->getFieldDefinition();
         $formConfig = $fieldForm->getConfig();
         $fieldType = $this->fieldTypeService->getFieldType($fieldDefinition->fieldTypeIdentifier);
 
@@ -119,7 +99,7 @@ class FormMapper implements FieldValueFormMapperInterface, FieldDefinitionFormMa
             );
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults(

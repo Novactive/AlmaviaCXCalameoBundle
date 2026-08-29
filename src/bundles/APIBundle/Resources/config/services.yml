@@ -1,7 +1,8 @@
 parameters:
-    almaviacx.calameo.api.key: ~
-    almaviacx.calameo.api.secret: ~
+    almaviacx.calameo.api.key: ''
+    almaviacx.calameo.api.secret: ''
     almaviacx.calameo.http_client.config: []
+    almaviacx.calameo.delete_book_enable: false
 
 services:
   # default configuration for services in *this* file
@@ -15,6 +16,7 @@ services:
     public: false
 
   AlmaviaCX\Calameo\API\HttpClient:
+    lazy: true
     arguments:
       $APIKey: "%almaviacx.calameo.api.key%"
       $APISecret: "%almaviacx.calameo.api.secret%"
@@ -22,7 +24,7 @@ services:
 
   AlmaviaCX\Calameo\API\Serializer:
     arguments:
-      $baseSerializer: "@jms_serializer"
+      $baseSerializer: '@JMS\Serializer\SerializerInterface'
 
   AlmaviaCX\Calameo\API\Gateway\:
     resource: "../../../../lib/API/Gateway/*"
@@ -32,3 +34,9 @@ services:
 
   AlmaviaCX\Calameo\API\Service\:
     resource: "../../../../lib/API/Service/*"
+
+  AlmaviaCX\Calameo\Exception\ExceptionThrower:
+
+  AlmaviaCX\Calameo\API\Repository\PublicationRepository:
+    arguments:
+      $deleteBookEnable: "%almaviacx.calameo.delete_book_enable%"

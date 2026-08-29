@@ -1,4 +1,4 @@
 system:
     default:
         field_templates:
-            - { template: '@ezdesign/field/calameo_publication_field.html.twig', priority: 10 }
+            - { template: '@ibexadesign/field/calameo_publication_field.html.twig', priority: 10 }

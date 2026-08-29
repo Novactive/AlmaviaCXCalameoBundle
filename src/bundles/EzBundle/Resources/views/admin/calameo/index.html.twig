@@ -1,0 +1,77 @@
+{# Resources/views/admin/calameo/index.html.twig #}
+
+{% extends '@ibexadesign/ui/layout.html.twig' %}
+
+{% block title %}Calaméo{% endblock %}
+
+{% block page_title %}
+  {% include '@ibexadesign/ui/page_title.html.twig' with {
+    title: 'Calaméo',
+    icon_name: 'catalog'
+  } %}
+{% endblock %}
+
+{% block breadcrumbs %}
+  {% include '@ibexadesign/ui/breadcrumbs.html.twig' with {
+    items: [
+      {
+        value: 'Calaméo',
+        url: path('almaviacx_calameo_admin_index')
+      },
+    ]
+  } %}
+{% endblock %}
+
+
+{% block content %}
+<nav>
+  <a href="{{ path('almaviacx_calameo_admin_index') }}">Configuration</a>
+  |
+  <a href="{{ path('almaviacx_calameo_admin_content_list') }}">Contenus</a>
+  |
+  <a href="{{ path('almaviacx_calameo_admin_publication_list') }}">Publications</a>
+</nav>
+
+<h2>Configuration</h2>
+
+<a target="_blank" href="https://www.calameo.com/account/dashboard">https://www.calameo.com/account/dashboard</a>
+
+<table>
+  <tbody>
+  <tr>
+    <th>FieldType</th>
+    <td>{{ field_type_identifier }}</td>
+  </tr>
+  <tr>
+    <th>Table</th>
+    <td>{{ table_name }}</td>
+  </tr>
+  <tr>
+    <th>Table présente</th>
+    <td>{{ table_exists ? 'oui' : 'non' }}</td>
+  </tr>
+
+  {% for key, value in configuration %}
+    <tr>
+      <th>{{ key }}</th>
+      <td>
+        {% if value is iterable %}
+          <pre>{{ value|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+        {% else %}
+          {{ value ?? 'non configuré' }}
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h2>Statistiques</h2>
+
+<ul>
+  <li>Définitions de champ Calaméo : {{ stats.field_definitions }}</li>
+  <li>Contenus avec champ Calaméo : {{ stats.contents }}</li>
+  <li>Entrées dans calameo_publication : {{ stats.publications ?? 'table absente' }}</li>
+</ul>
+
+{% endblock %}

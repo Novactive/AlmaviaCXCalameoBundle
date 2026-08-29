@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UploadGateway extends AbstractGateway
 {
-    public const ENDPOINT = 'http://upload.calameo.com/1.0';
+    public const string ENDPOINT = 'http://upload.calameo.com/1.0';
 
     /**
      * @param int   $subscriptionId

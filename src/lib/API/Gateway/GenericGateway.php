@@ -14,7 +14,7 @@ namespace AlmaviaCX\Calameo\API\Gateway;
 
 abstract class GenericGateway extends AbstractGateway
 {
-    public const ENDPOINT = 'http://api.calameo.com/1.0';
+    public const string ENDPOINT = 'http://api.calameo.com/1.0';
 
     protected function getEndpoint(): string
     {

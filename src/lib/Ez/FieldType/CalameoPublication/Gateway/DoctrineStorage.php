@@ -13,17 +13,17 @@ declare(strict_types=1);
 namespace AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Gateway;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\FetchMode;
 use Doctrine\DBAL\Query\QueryBuilder;
-use eZ\Publish\SPI\FieldType\StorageGateway;
-use eZ\Publish\SPI\Persistence\Content\Field;
-use eZ\Publish\SPI\Persistence\Content\VersionInfo;
+use Ibexa\Contracts\Core\FieldType\StorageGateway;
+use Ibexa\Contracts\Core\Persistence\Content\Field;
+use Ibexa\Contracts\Core\Persistence\Content\VersionInfo;
 use PDO;
 
 class DoctrineStorage extends StorageGateway
 {
-    /** @var Connection */
-    protected $connection;
+    protected Connection $connection;
 
     /**
      * DoctrineStorage constructor.
@@ -37,12 +37,13 @@ class DoctrineStorage extends StorageGateway
     /**
      * Store the file reference in $field for $versionNo.
      *
-     * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
-     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param VersionInfo $versionInfo
+     * @param Field $field
      *
      * @return bool
+     * @throws Exception
      */
-    public function storePublicationReference(VersionInfo $versionInfo, Field $field)
+    public function storePublicationReference(VersionInfo $versionInfo, Field $field): bool
     {
         $referencedData = $this->getPublicationReferenceData($field->id, $versionInfo->versionNo);
 
@@ -62,48 +63,49 @@ class DoctrineStorage extends StorageGateway
      * add additional columns to be set in the database. Please do not forget
      * to call the parent when overwriting this method.
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder $queryBuilder
-     * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
-     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param QueryBuilder $queryBuilder
+     * @param VersionInfo $versionInfo
+     * @param Field $field
      */
-    protected function setInsertColumns(QueryBuilder $queryBuilder, VersionInfo $versionInfo, Field $field)
+    protected function setInsertColumns(QueryBuilder $queryBuilder, VersionInfo $versionInfo, Field $field): void
     {
         $queryBuilder
             ->setValue('contentobject_attribute_id', ':fieldId')
             ->setValue('publication_id', ':publicationId')
             ->setValue('folder_id', ':folderId')
             ->setValue('version', ':versionNo')
-            ->setParameter(':fieldId', $field->id, PDO::PARAM_INT)
-            ->setParameter(':publicationId', $field->value->externalData['publicationId'], PDO::PARAM_STR)
-            ->setParameter(':folderId', $field->value->externalData['folderId'], PDO::PARAM_INT)
-            ->setParameter(':versionNo', $versionInfo->versionNo, PDO::PARAM_INT)
+            ->setParameter('fieldId', $field->id, PDO::PARAM_INT)
+            ->setParameter('publicationId', $field->value->externalData['publicationId'], PDO::PARAM_STR)
+            ->setParameter('folderId', $field->value->externalData['folderId'], PDO::PARAM_INT)
+            ->setParameter('versionNo', $versionInfo->versionNo, PDO::PARAM_INT)
         ;
     }
 
     /**
-     * @param \Doctrine\DBAL\Query\QueryBuilder $queryBuilder
-     * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
-     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param QueryBuilder $queryBuilder
+     * @param VersionInfo $versionInfo
+     * @param Field $field
      */
-    protected function setUpdateColumns(QueryBuilder $queryBuilder, VersionInfo $versionInfo, Field $field)
+    protected function setUpdateColumns(QueryBuilder $queryBuilder, VersionInfo $versionInfo, Field $field): void
     {
         $queryBuilder
             ->set('contentobject_attribute_id', ':fieldId')
             ->set('publication_id', ':publicationId')
             ->set('folder_id', ':folderId')
             ->set('version', ':versionNo')
-            ->setParameter(':fieldId', $field->id, PDO::PARAM_INT)
-            ->setParameter(':publicationId', $field->value->externalData['publicationId'], PDO::PARAM_STR)
-            ->setParameter(':folderId', $field->value->externalData['folderId'], PDO::PARAM_INT)
-            ->setParameter(':versionNo', $versionInfo->versionNo, PDO::PARAM_INT)
+            ->setParameter('fieldId', $field->id, PDO::PARAM_INT)
+            ->setParameter('publicationId', $field->value->externalData['publicationId'], PDO::PARAM_STR)
+            ->setParameter('folderId', $field->value->externalData['folderId'], PDO::PARAM_INT)
+            ->setParameter('versionNo', $versionInfo->versionNo, PDO::PARAM_INT)
         ;
     }
 
     /**
-     * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
-     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param VersionInfo $versionInfo
+     * @param Field $field
+     * @throws Exception
      */
-    protected function updateFieldData(VersionInfo $versionInfo, Field $field)
+    protected function updateFieldData(VersionInfo $versionInfo, Field $field): void
     {
         $updateQuery = $this->connection->createQueryBuilder();
         $updateQuery->update(
@@ -124,18 +126,19 @@ class DoctrineStorage extends StorageGateway
                     )
                 )
             )
-            ->setParameter(':fieldId', $field->id, PDO::PARAM_INT)
-            ->setParameter(':versionNo', $versionInfo->versionNo, PDO::PARAM_INT)
+            ->setParameter('fieldId', $field->id, PDO::PARAM_INT)
+            ->setParameter('versionNo', $versionInfo->versionNo, PDO::PARAM_INT)
         ;
 
         $updateQuery->execute();
     }
 
     /**
-     * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
-     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param VersionInfo $versionInfo
+     * @param Field $field
+     * @throws Exception
      */
-    protected function storeNewFieldData(VersionInfo $versionInfo, Field $field)
+    protected function storeNewFieldData(VersionInfo $versionInfo, Field $field): void
     {
         $insertQuery = $this->connection->createQueryBuilder();
         $insertQuery->insert(
@@ -155,7 +158,7 @@ class DoctrineStorage extends StorageGateway
      *
      * @return mixed
      */
-    protected function castToPropertyValue($value, $columnName)
+    protected function castToPropertyValue(mixed $value, string $columnName): mixed
     {
         $propertyMap = $this->getPropertyMapping();
         $castFunction = $propertyMap[$columnName]['cast'];
@@ -170,11 +173,11 @@ class DoctrineStorage extends StorageGateway
      * add additional columns to be fetched from the database. Please do not
      * forget to call the parent when overwriting this method.
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder $queryBuilder
+     * @param QueryBuilder $queryBuilder
      * @param int $fieldId
      * @param int $versionNo
      */
-    protected function setFetchColumns(QueryBuilder $queryBuilder, $fieldId, $versionNo)
+    protected function setFetchColumns(QueryBuilder $queryBuilder, $fieldId, $versionNo): void
     {
         $queryBuilder->select(
             $this->connection->quoteIdentifier('publication_id'),
@@ -189,8 +192,9 @@ class DoctrineStorage extends StorageGateway
      * @param int $versionNo
      *
      * @return array|null
+     * @throws Exception
      */
-    public function getPublicationReferenceData(int $fieldId, int $versionNo)
+    public function getPublicationReferenceData(int $fieldId, int $versionNo): ?array
     {
         $selectQuery = $this->connection->createQueryBuilder();
 
@@ -210,8 +214,8 @@ class DoctrineStorage extends StorageGateway
                     )
                 )
             )
-            ->setParameter(':fieldId', $fieldId, PDO::PARAM_INT)
-            ->setParameter(':versionNo', $versionNo, PDO::PARAM_INT)
+            ->setParameter('fieldId', $fieldId, PDO::PARAM_INT)
+            ->setParameter('versionNo', $versionNo, PDO::PARAM_INT)
         ;
 
         $statement = $selectQuery->execute();
@@ -236,8 +240,9 @@ class DoctrineStorage extends StorageGateway
      * @param array $fieldIds
      *
      * @return array
+     * @throws Exception
      */
-    public function getReferencedPublications(array $fieldIds)
+    public function getReferencedPublications(array $fieldIds): array
     {
         if (empty($fieldIds)) {
             return [];
@@ -256,7 +261,7 @@ class DoctrineStorage extends StorageGateway
                     ':fieldIds'
                 )
             )
-            ->setParameter(':fieldIds', $fieldIds, Connection::PARAM_INT_ARRAY);
+            ->setParameter('fieldIds', $fieldIds, Connection::PARAM_INT_ARRAY);
         $statement = $selectQuery->execute();
 
         $publicationIds = [];
@@ -274,7 +279,7 @@ class DoctrineStorage extends StorageGateway
      *
      * @return string
      */
-    protected function toPropertyName($columnName)
+    protected function toPropertyName(string $columnName): string
     {
         $propertyMap = $this->getPropertyMapping();
 
@@ -286,8 +291,9 @@ class DoctrineStorage extends StorageGateway
      *
      * @param array $fieldIds
      * @param int $versionNo
+     * @throws Exception
      */
-    public function removePublicationReferences(array $fieldIds, $versionNo)
+    public function removePublicationReferences(array $fieldIds, int $versionNo): void
     {
         if (empty($fieldIds)) {
             return;
@@ -308,8 +314,8 @@ class DoctrineStorage extends StorageGateway
                     )
                 )
             )
-            ->setParameter(':fieldIds', $fieldIds, Connection::PARAM_INT_ARRAY)
-            ->setParameter(':versionNo', $versionNo, PDO::PARAM_INT)
+            ->setParameter('fieldIds', $fieldIds, Connection::PARAM_INT_ARRAY)
+            ->setParameter('versionNo', $versionNo, PDO::PARAM_INT)
         ;
 
         $deleteQuery->execute();
@@ -320,7 +326,7 @@ class DoctrineStorage extends StorageGateway
      *
      * @return array
      */
-    protected function getPropertyMapping()
+    protected function getPropertyMapping(): array
     {
         return [
             'publication_id' => [

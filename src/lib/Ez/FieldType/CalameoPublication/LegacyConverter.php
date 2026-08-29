@@ -12,11 +12,11 @@ declare(strict_types=1);
 
 namespace AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication;
 
-use eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter;
-use eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldDefinition;
-use eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldValue;
-use eZ\Publish\SPI\Persistence\Content\FieldValue;
-use eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition;
+use Ibexa\Core\Persistence\Legacy\Content\FieldValue\Converter;
+use Ibexa\Core\Persistence\Legacy\Content\StorageFieldDefinition;
+use Ibexa\Core\Persistence\Legacy\Content\StorageFieldValue;
+use Ibexa\Contracts\Core\Persistence\Content\FieldValue;
+use Ibexa\Contracts\Core\Persistence\Content\Type\FieldDefinition;
 
 class LegacyConverter implements Converter
 {
@@ -29,20 +29,20 @@ class LegacyConverter implements Converter
     {
     }
 
-    public function toStorageFieldDefinition(FieldDefinition $fieldDef, StorageFieldDefinition $storageDef)
+    public function toStorageFieldDefinition(FieldDefinition $fieldDef, StorageFieldDefinition $storageDef): void
     {
         $fieldSettings = $fieldDef->fieldTypeConstraints->fieldSettings;
         $storageDef->dataText1 = implode('|', $fieldSettings['availableFolderIds'] ?? []);
     }
 
-    public function toFieldDefinition(StorageFieldDefinition $storageDef, FieldDefinition $fieldDef)
+    public function toFieldDefinition(StorageFieldDefinition $storageDef, FieldDefinition $fieldDef): void
     {
         $fieldDef->fieldTypeConstraints->fieldSettings = [
             'availableFolderIds' => explode('|', $storageDef->dataText1 ?? "")
         ];
     }
 
-    public function getIndexColumn()
+    public function getIndexColumn(): string
     {
         return 'sort_key_string';
     }

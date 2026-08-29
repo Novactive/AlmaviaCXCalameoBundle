@@ -20,24 +20,20 @@ class HttpClient extends Client
 {
     /**
      * Calameo API Key
-     *
-     * @var string
      */
-    protected $APIKey;
+    protected ?string $APIKey;
 
     /**
      * CalameoAPI Secret
-     *
-     * @var string
      */
-    protected $APISecret;
+    protected ?string $APISecret;
 
     /**
      * HttpClient constructor.
      *
-     * @param string $APIKey
-     * @param string $APISecret
-     * @param array  $config
+     * @param string|null $APIKey
+     * @param string|null $APISecret
+     * @param array $config
      */
     public function __construct(?string $APIKey, ?string $APISecret, array $config = [])
     {

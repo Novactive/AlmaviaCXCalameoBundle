@@ -11,22 +11,41 @@ services:
     # if you need to do this, you can override this setting on individual services
     public: false
 
+  AlmaviaCX\Calameo\:
+    # * AlmaviaCXCalameoBundle/src/
+    #  ** bundles/EzBundle/Resources/config/services.yml
+    #  ** lib
+    #
+    # namespace AlmaviaCX\Calameo\Ez\Form\Type\FieldType;
+    resource: '../../../../lib/*'
+#    exclude:
+#      - '../../../../lib/**/Value/'
+#      - '../../../../lib/**/Exception/'
+
   AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\FormMapper:
     tags:
       - { name: ez.fieldFormMapper.definition, fieldType: calameo_publication }
       - { name: ez.fieldFormMapper.value, fieldType: calameo_publication }
+      - { name: ibexa.admin_ui.field_type.form.mapper.definition, fieldType: calameo_publication }
+      - { name: ibexa.admin_ui.field_type.form.mapper.value, fieldType: calameo_publication }
 
   AlmaviaCX\Calameo\Ez\Form\Type\FieldType\CalameoPublicationFieldType:
 
   AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Gateway\DoctrineStorage:
 
-  almaviacx.calameo.httpclient.siteaccessaware:
+  AlmaviaCX\Calameo\API\HttpClientFactory: ~
+
+  AlmaviaCX\Calameo\API\HttpClient:
     lazy: true
-    class: AlmaviaCX\Calameo\API\HttpClient
-    decorates: AlmaviaCX\Calameo\API\HttpClient
-    arguments:
-      $APIKey: "$calameo.api.key;almaviacx$"
-      $APISecret: "$calameo.api.secret;almaviacx$"
-      $config: "$calameo.config;almaviacx$"
+    factory: ['@AlmaviaCX\Calameo\API\HttpClientFactory', 'create']
 
   AlmaviaCX\Calameo\Ez\Twig\CalameoTwigExtension:
+
+  AlmaviaCX\Bundle\Calameo\EzBundle\Controller\:
+    resource: '../../Controller/'
+    arguments:
+      $APIKey: "%almaviacx.calameo.api.key%"
+      $APISecret: "%almaviacx.calameo.api.secret%"
+      $config: "%almaviacx.calameo.http_client.config%"
+      $deleteBookEnable: "%almaviacx.calameo.delete_book_enable%"
+    tags: ['controller.service_arguments']

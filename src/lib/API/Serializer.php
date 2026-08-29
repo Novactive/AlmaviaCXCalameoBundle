@@ -13,20 +13,13 @@ declare(strict_types=1);
 namespace AlmaviaCX\Calameo\API;
 
 use AlmaviaCX\Calameo\API\Value\Response\Response;
+use JMS\Serializer\SerializerInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class Serializer
+readonly class Serializer
 {
-    /** @var \JMS\Serializer\Serializer */
-    protected $baseSerializer;
-
-    /**
-     * Serializer constructor.
-     * @param \JMS\Serializer\Serializer $baseSerializer
-     */
-    public function __construct(\JMS\Serializer\Serializer $baseSerializer)
+    public function __construct(protected SerializerInterface $baseSerializer)
     {
-        $this->baseSerializer = $baseSerializer;
     }
 
     public function deserializeResponse(

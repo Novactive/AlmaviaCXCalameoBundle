@@ -16,42 +16,42 @@ use JMS\Serializer\Annotation as Serializer;
 
 class Response
 {
-    public const TYPE_OK ="ok";
-    public const TYPE_ERROR ="error";
+    public const string TYPE_OK ="ok";
+    public const string TYPE_ERROR ="error";
 
     /**
      * @var string
      * @Serializer\Type("string")
      */
-    public $status;
+    public string $status;
 
     /**
      * @var int
      * @Serializer\Type("int")
      */
-    public $version;
+    public int $version;
 
     /**
      * @var string
      * @Serializer\Type("string")
      */
-    public $requestid;
+    public string $requestid;
 
     /**
      * @var int
      * @Serializer\Type("int")
      */
-    public $requests;
+    public int $requests;
 
     /**
      * @var Error|null
      * @Serializer\Type("AlmaviaCX\Calameo\API\Value\Response\Error")
      */
-    public $error;
+    public ?Error $error;
 
     /**
      * @var ResponseContent
      * @Serializer\Type("AlmaviaCX\Calameo\API\Value\Response\ResponseContent")
      */
-    public $content;
+    public ResponseContent $content;
 }

@@ -15,19 +15,15 @@ namespace AlmaviaCX\Calameo\API\Service;
 use AlmaviaCX\Calameo\API\Gateway\UploadGateway;
 use AlmaviaCX\Calameo\API\Value\Publication;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
+use AlmaviaCX\Calameo\Exception\CalameoResponseContentMustBePublication;
 use AlmaviaCX\Calameo\Exception\NotImplementedException;
 use GuzzleHttp\Exception\GuzzleException;
 use SplFileInfo;
 
 class PublishingService
 {
-    /** @var UploadGateway */
-    protected $gateway;
+    protected UploadGateway $gateway;
 
-    /**
-     * PublishingService constructor.
-     * @param UploadGateway $gateway
-     */
     public function __construct(UploadGateway $gateway)
     {
         $this->gateway = $gateway;
@@ -39,6 +35,7 @@ class PublishingService
      * @return Publication
      * @throws ApiResponseErrorException
      * @throws GuzzleException
+     * @throws CalameoResponseContentMustBePublication
      */
     public function publish(
         int $folderId,
@@ -50,7 +47,10 @@ class PublishingService
             $file,
             $options
         );
-        return $response->content;
+        if ($response->content instanceof Publication) {
+            return $response->content;
+        }
+        throw new CalameoResponseContentMustBePublication();
     }
 
     /**
@@ -60,6 +60,7 @@ class PublishingService
      * @return Publication
      * @throws ApiResponseErrorException
      * @throws GuzzleException
+     * @throws CalameoResponseContentMustBePublication
      */
     public function publishFromUrl(int $folderId, string $url, array $options = []): Publication
     {
@@ -68,7 +69,10 @@ class PublishingService
             $url,
             $options
         );
-        return $response->content;
+        if ($response->content instanceof Publication) {
+            return $response->content;
+        }
+        throw new CalameoResponseContentMustBePublication();
     }
 
     /**
@@ -88,6 +92,7 @@ class PublishingService
      * @return Publication
      * @throws ApiResponseErrorException
      * @throws GuzzleException
+     * @throws CalameoResponseContentMustBePublication
      */
     public function revise(string $publicationId, SplFileInfo $file): Publication
     {
@@ -95,7 +100,10 @@ class PublishingService
             $publicationId,
             $file
         );
-        return $response->content;
+        if ($response->content instanceof Publication) {
+            return $response->content;
+        }
+        throw new CalameoResponseContentMustBePublication();
     }
 
     /**
@@ -104,7 +112,7 @@ class PublishingService
      * @param int $folderId
      * @return Publication
      * @throws ApiResponseErrorException
-     * @throws GuzzleException
+     * @throws GuzzleException|CalameoResponseContentMustBePublication
      */
     public function reviseFromUrl(string $publicationId, string $url, int $folderId): Publication
     {
@@ -113,7 +121,10 @@ class PublishingService
             $url,
             $folderId
         );
-        return $response->content;
+        if ($response->content instanceof Publication) {
+            return $response->content;
+        }
+        throw new CalameoResponseContentMustBePublication();
     }
 
     /**

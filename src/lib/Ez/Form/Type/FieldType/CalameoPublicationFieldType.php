@@ -13,12 +13,11 @@ declare(strict_types=1);
 namespace AlmaviaCX\Calameo\Ez\Form\Type\FieldType;
 
 use AlmaviaCX\Calameo\API\Repository\AccountRepository;
-use AlmaviaCX\Calameo\API\Repository\FolderRepository;
 use AlmaviaCX\Calameo\Exception\ApiResponseErrorException;
 use AlmaviaCX\Calameo\Ez\FieldType\CalameoPublication\Value;
-use EzSystems\EzPlatformAdminUi\Notification\NotificationHandlerInterface;
-use EzSystems\RepositoryForms\Form\Type\FieldType\BinaryBaseFieldType;
-use GuzzleHttp\Exception\GuzzleException;
+use Ibexa\ContentForms\Form\Type\FieldType\BinaryBaseFieldType;
+use Ibexa\Contracts\AdminUi\Notification\NotificationHandlerInterface;
+use JMS\TranslationBundle\Annotation\Desc;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -31,33 +30,24 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CalameoPublicationFieldType extends AbstractType
 {
-    /** @var AccountRepository */
-    protected $accountRepository;
-
-    /** @var NotificationHandlerInterface */
-    protected $notificationHandler;
-
-    /**
-     * @param AccountRepository            $accountRepository
-     * @param NotificationHandlerInterface $notificationHandler
-     */
-    public function __construct(AccountRepository $accountRepository, NotificationHandlerInterface $notificationHandler)
+    public function __construct(
+        protected readonly AccountRepository $accountRepository,
+        protected readonly NotificationHandlerInterface $notificationHandler
+    )
     {
-        $this->accountRepository = $accountRepository;
-        $this->notificationHandler = $notificationHandler;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->getBlockPrefix();
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'ezplatform_fieldtype_calameo_publication';
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $folderChoices = [];
         $filteredFolderChoices = [];
@@ -66,7 +56,7 @@ class CalameoPublicationFieldType extends AbstractType
         do {
             try {
                 $availableFolders = $this->accountRepository->fetchAccountFolders($limit, $offset);
-            } catch (ApiResponseErrorException $exception) {
+            } catch (\GuzzleHttp\Exception\ClientException|ApiResponseErrorException $exception) {
                 $this->notificationHandler->error(
                     sprintf("[Calameo] %s", $exception->getMessage())
                 );
@@ -135,12 +125,12 @@ class CalameoPublicationFieldType extends AbstractType
         );
     }
 
-    public function getParent()
+    public function getParent(): string
     {
         return BinaryBaseFieldType::class;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
